@@ -1,3 +1,4 @@
+/* eslint-disable no-alert */
 import { getPosts } from '../controllers/firestore.js';
 
 export default () => {
@@ -41,7 +42,7 @@ export default () => {
         <aside class="main-container_aside">
             <section class="aside-post_section">
                 <div class="aside-title">
-                    <img src="./img/ejemplo.jpg" alt="">Giovand
+                    <img src="./img/ejemplo.jpg" id="imagenPost" alt="">Giovand
                 </div>
                 <p class="aside-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto, qui!</p>
                 <div class="aside-post">
@@ -61,6 +62,7 @@ export default () => {
   divElement.classList.add('container');
   divElement.innerHTML = viewInicio;
 
+  // Subir Imagenes
 
   const postForm = divElement.querySelector('.upload-post');
   const cardsContainer = divElement.querySelector('.card-container');
@@ -69,24 +71,30 @@ export default () => {
   btnUpImage.addEventListener('click', () => {
     const ref = firebase.storage().ref();
     const file = postForm['post-image'].files[0];
-    const name = file.name;
-
-    const metadata = {
-      contentType: file.type,
-    };
-
-    const task = ref.child(name).put(file, metadata);
-    task
-      .then(snapshot => snapshot.ref.getDownloadURL())
-      .then((url) => {
-        // eslint-disable-next-line no-console
-        console.log(url);
-        // eslint-disable-next-line no-alert
-        alert('Image upload successful');
-        const image = postForm.image;
-        image.src = url;
-      });
+    // eslint-disable-next-line prefer-template
+    const name = new Date() + '-' + file.name;
+    if (file == null) {
+      alert('debe seleccionar una imagen');
+    } else {
+      const metadata = {
+        contentType: file.type,
+      };
+      const task = ref.child(name).put(file, metadata);
+      task
+        .then(snapshot => snapshot.ref.getDownloadURL())
+        .then((url) => {
+          // eslint-disable-next-line no-console
+          console.log(url);
+          // eslint-disable-next-line no-alert
+          alert('Image upload successful');
+          const image = postForm.image;
+          // const image = document.querySelector('#imagenPost');
+          image.src = url;
+        });
+    }
   });
+
+  // posts
 
   let editStatus = false;
   let id = '';
