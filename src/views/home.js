@@ -1,3 +1,8 @@
+/* eslint-disable no-console */
+/* eslint-disable no-param-reassign */
+/* eslint-disable import/named */
+/* eslint-disable no-undef */
+/* eslint-disable no-shadow */
 
 import { getPosts } from '../controllers/firestore.js';
 
@@ -57,23 +62,24 @@ export default () => {
   divElement.classList.add('container');
   divElement.innerHTML = viewInicio;
 
-  const postForm = divElement.querySelector(".upload-post");
-  const cardsContainer = divElement.querySelector(".card-container");
-  const signOut = divElement.querySelector("#sign-out");
+  const postForm = divElement.querySelector('.upload-post');
+  const cardsContainer = divElement.querySelector('.card-container');
+  // eslint-disable-next-line no-unused-vars
+  const signOut = divElement.querySelector('#sign-out');
 
   let editStatus = false;
-  let id = "";
-  let imageURL = "";
+  let id = '';
+  let imageURL = '';
 
-  let nameLocal = localStorage.getItem("name");
+  const nameLocal = localStorage.getItem('name');
 
-  /*--SUBIR IMAGEN CON STORAGE---*/
-  let file = postForm["post-image"];
-  const image = divElement.querySelector("#image");
+  /* --SUBIR IMAGEN CON STORAGE---*/
+  let file = postForm['post-image'];
+  const image = divElement.querySelector('#image');
 
-  file.addEventListener("change", () => {
+  file.addEventListener('change', () => {
     file = file.files[0];
-    console.log("file", file);
+    console.log('file', file);
     if (file.length) {
       const ref = firebase.storage().ref();
       const name = file.name;
@@ -84,19 +90,19 @@ export default () => {
 
       const task = ref.child(name).put(file, metadata);
       task
-        .then((snapshot) => snapshot.ref.getDownloadURL())
+        .then(snapshot => snapshot.ref.getDownloadURL())
         .then((url) => {
           /* console.log(url); */
           image.src = url;
           imageURL = url;
         });
     } else {
-      console.log("No hay ningun archivo");
+      console.log('No hay ningun archivo');
     }
   });
 
-  const postForm = divElement.querySelector('.upload-post');
-  const cardsContainer = divElement.querySelector('.card-container');
+  // const postForm = divElement.querySelector('.upload-post');
+  // const cardsContainer = divElement.querySelector('.card-container');
   const btnUpImage = divElement.querySelector('#upload-image');
 
   btnUpImage.addEventListener('click', () => {
@@ -121,8 +127,8 @@ export default () => {
       });
   });
 
-  let editStatus = false;
-  let id = '';
+  // let editStatus = false;
+  // let id = '';
   const db = firebase.firestore();
   const savePost = (title, description) => db.collection('posts').doc().set({
     title,
@@ -141,7 +147,7 @@ export default () => {
     onGetPosts((querySnapshot) => {
       cardsContainer.innerHTML = '';
       querySnapshot.forEach((doc) => {
-        //console.log('rara',doc);
+        // console.log('rara',doc);
         const post = doc.data();
         post.id = doc.id;
         cardsContainer.innerHTML += `
@@ -171,48 +177,42 @@ export default () => {
         </section>`;
       });
 
-        const btnsDelete = document.querySelectorAll('.btn-delete');
-        btnsDelete.forEach((btn) => 
-                           
-          btn.addEventListener('click', async (e) => {
-          
-            await deletePost(e.target.dataset.id);
-            /* console.log(e.target); */
-          });
-        });
+      const btnsDelete = document.querySelectorAll('.btn-delete');
+      btnsDelete.forEach(btn => btn.addEventListener('click', async (e) => {
+        await deletePost(e.target.dataset.id);
+        /* console.log(e.target); */
+      }));
 
-        const btnsEdit = document.querySelectorAll('.btn-edit');
-        btnsEdit.forEach((btn) => {
-          
-          btn.addEventListener('click', async (e) => {
-            // eslint-disable-next-line no-shadow
-            const doc = await getPost(e.target.dataset.id);
-            // eslint-disable-next-line no-shadow
+      const btnsEdit = document.querySelectorAll('.btn-edit');
+      btnsEdit.forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          // eslint-disable-next-line no-shadow
+          const doc = await getPost(e.target.dataset.id);
+          // eslint-disable-next-line no-shadow
 
-            const post = doc.data();
-            /* const cardFather = e.target.closest('.card');
+          const post = doc.data();
+          /* const cardFather = e.target.closest('.card');
             const form = cardFather.querySelector('.upload-post');
             form.style.display = 'block'; */
           /* console.log(e.target); */
           editStatus = true;
           id = e.target.dataset.id;
 
-          const cardFather = e.target.closest(".card");
-          const input = cardFather.querySelector("#input-user-description");
+          const cardFather = e.target.closest('.card');
+          const input = cardFather.querySelector('#input-user-description');
           input.disabled = false;
           input.focus();
 
-          btn.innerText = "Actualizar";
+          btn.innerText = 'Actualizar';
 
-            btn.innerText = "Actualizar";
+          btn.innerText = 'Actualizar';
 
-            postForm.querySelector('#post-title').value = post.title;
-            postForm.querySelector('#post-description').value = post.description;
-            postForm['btn-save'].innerText = 'Actualizar';
-
-          });
+          postForm.querySelector('#post-title').value = post.title;
+          postForm.querySelector('#post-description').value = post.description;
+          postForm['btn-save'].innerText = 'Actualizar';
         });
       });
+    });
   } else {
     // eslint-disable-next-line no-unused-vars
     document.addEventListener('DOMContentLoaded', (e) => {
@@ -236,7 +236,6 @@ export default () => {
       });
       editStatus = false;
       postForm['btn-save'].innerText = 'Guardar';
-
     }
     await getPosts();
     postForm.reset();
