@@ -46,7 +46,12 @@ export default () => {
 
     const inputEmail = document.querySelector('#email').value;
     const inputPassword = document.querySelector('#password').value;
-    // eslint-disable-next-line no-console
+
+    signIn(inputEmail, inputPassword)
+      .then((result) => {
+        name = result.user.email.split(regExp)[0]
+        localStorage.setItem('name', name)
+
     console.log(inputEmail, inputPassword);
 
     signIn(inputEmail, inputPassword)
@@ -68,10 +73,16 @@ export default () => {
 
     signInWithGoogle(provider)
       .then((result) => {
+
+        name = result.additionalUserInfo.profile.given_name
+        name.split(regExp)[0]
+        /* console.log('name2', name);  */
+
         name = result.additionalUserInfo.profile.given_name;
         // eslint-disable-next-line no-unused-expressions
         name.split(regExp)[0];
         /* console.log('name2', name); */
+
         window.location.hash = '#/home';
       })
       // eslint-disable-next-line no-console
@@ -85,9 +96,22 @@ export default () => {
 
     signInWithFacebook(provider)
       .then((result) => {
+
+        console.log('result', result);
+        name = result.additionalUserInfo.profile.name(regExp)
+        name.split(regExp)[0]
+        console.log('name3', name);
+       /*  name = result.additionalUserInfo.profile.given_name(regExp)
+        name.split(regExp)[0] */
+
         name = result.additionalUserInfo.profile.given_name(regExp);
         // eslint-disable-next-line no-unused-expressions
         name.split(regExp)[0];
+
+        name = result.additionalUserInfo.profile.given_name(regExp);
+        // eslint-disable-next-line no-unused-expressions
+        name.split(regExp)[0];
+
         /* console.log('name3', name); */
         window.location.hash = '#/home';
       })
