@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { signUp } from '../controllers/firestore.js';
 
 export default () => {
