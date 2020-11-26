@@ -3,6 +3,7 @@ import {
   getPosts,
   deletePost,
   updatePost,
+  signOut
 } from '../controllers/firestore.js';
 
 export default () => {
@@ -14,7 +15,7 @@ export default () => {
                 <li class="nav-container_item"><a href="#/home" class="nav-container_link"><i class="fas fa-home"></i>&nbsp;Inicio</a></li>
                 <li class="nav-container_item"><a href="#/contactos" class="nav-container_link"><i class="fas fa-users"></i>&nbsp;Contactos</a></li>
                 <li class="nav-container_item"><a href="#/perfil" class="nav-container_link"><i class="fas fa-grin-alt"></i>&nbsp;Perfil</a></li>
-                <li class="nav-container_item" id="sign-out"><a class="nav-container_link"><i class="fas fa-home" ></i>&nbsp;Cerrar Sesión</a></li>
+                <li class="nav-container_item" id="sign-out-btn"><a class="nav-container_link"><i class="fas fa-home" ></i>&nbsp;Cerrar Sesión</a></li>
             </ul>
         </nav>
         <section class="photo-perfil"><img src="./img/ejemplo.jpg" alt=""></section>
@@ -63,7 +64,7 @@ export default () => {
 
   const postForm = divElement.querySelector('.upload-post');
   const cardsContainer = divElement.querySelector('.card-container');
-  const signOut = divElement.querySelector('#sign-out');
+  const signOutBtn = divElement.querySelector('#sign-out-btn');
 
   let id = '';
   let imageURL = '';
@@ -94,18 +95,6 @@ export default () => {
       });
   });
 
-
-  signOut.addEventListener('click', (e) => {
-    e.preventDefault();
-    firebase
-      .auth()
-      .signOut()
-      .then(() => {
-        console.log('signOut...');
-        window.location.hash = '#/';
-      });
-  });
-
   /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
   const templateCard = (data) => {
     if (data.length) {
@@ -113,7 +102,7 @@ export default () => {
       data.forEach((element) => {
         cardsContainer.innerHTML += `
         <section class="card">
-          <section class="card-title"><img src="./img/ejemplo.jpg" alt="">${nameLocal}</section>
+          <section class="card-title"><img src="./img/ejemplo.jpg" alt="">${element.name}</section>
           <section class="card-image"><img src="${element.imageURL}" alt=""></section>
           <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
           <section class="card-options">
@@ -196,16 +185,7 @@ export default () => {
     e.preventDefault();
 
     const description = postForm['post-description'];
-    await savePost(imageURL, description.value);
-    /* if (!editStatus) {
-      await savePost(imageURL, description.value);
-    } else {
-      await updatePost(id, {
-        description: description.value,
-      });
-      editStatus = false;
-      postForm["btn-save"].innerText = "Guardar";
-    } */
+    await savePost(nameLocal, description.value, imageURL);
     await getPosts((data) => {
       // console.log(data);
       templateCard(data);
@@ -225,5 +205,16 @@ export default () => {
       console.log('Estas fuera de sesion');
     }
   });
+
+  /* --SALIR DE SESIÓN---*/
+  signOutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    signOut()
+      .then(() => {
+        console.log('signOut...');
+        window.location.hash = '#/';
+      });
+  });
+
   return divElement;
 };

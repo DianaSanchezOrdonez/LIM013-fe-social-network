@@ -7,6 +7,8 @@ const signInWithGoogle = provider => firebase.auth().signInWithPopup(provider);
 
 const signInWithFacebook = provider => firebase.auth().signInWithPopup(provider);
 
+const signOut = () => firebase.auth().signOut();
+
 const getPosts = callback => firebase
   .firestore()
   .collection('posts')
@@ -18,6 +20,7 @@ const getPosts = callback => firebase
       // console.log(doc.id, ' => ', doc.data());
       data.push({
         id: doc.id,
+        name: doc.data().name,
         description: doc.data().description,
         imageURL: doc.data().imageURL,
       });
@@ -25,9 +28,10 @@ const getPosts = callback => firebase
     callback(data);
   });
 
-const savePost = (imageURL, description) => firebase.firestore().collection('posts').doc().set({
-  imageURL,
+const savePost = (name, description, imageURL) => firebase.firestore().collection('posts').doc().set({
+  name,
   description,
+  imageURL,
 });
 
 const deletePost = id => firebase.firestore().collection('posts').doc(id).delete();
@@ -43,4 +47,5 @@ export {
   signIn,
   signInWithGoogle,
   signInWithFacebook,
+  signOut
 };
