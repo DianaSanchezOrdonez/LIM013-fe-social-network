@@ -1,4 +1,10 @@
-import { getPosts } from '../controllers/firestore.js';
+import {
+  savePost,
+  getPosts,
+  deletePost,
+  updatePost,
+  signOut
+} from '../controllers/firestore.js';
 
 export default () => {
   const viewInicio = `
@@ -9,7 +15,7 @@ export default () => {
                 <li class="nav-container_item"><a href="#/home" class="nav-container_link"><i class="fas fa-home"></i>&nbsp;Inicio</a></li>
                 <li class="nav-container_item"><a href="#/contactos" class="nav-container_link"><i class="fas fa-users"></i>&nbsp;Contactos</a></li>
                 <li class="nav-container_item"><a href="#/perfil" class="nav-container_link"><i class="fas fa-grin-alt"></i>&nbsp;Perfil</a></li>
-                <li class="nav-container_item"><a href="#/" class="nav-container_link"><i class="fas fa-home"></i>&nbsp;Cerrar Sesión</a></li>
+                <li class="nav-container_item" id="sign-out-btn"><a class="nav-container_link"><i class="fas fa-home" ></i>&nbsp;Cerrar Sesión</a></li>
             </ul>
         </nav>
         <section class="photo-perfil"><img src="./img/ejemplo.jpg" alt=""></section>
@@ -20,18 +26,13 @@ export default () => {
     <main class="main-container">
         <section class="main-container_section">
             <form class="upload-post">
-                <input type="text" id="post-title" class="input-post" placeholder="¿Qué aprendiste hoy?" autofocus>
-                <input type="file" id="post-image" class="input-post">
-                <img id='image' width='100px'>
-                <button id='upload-image'>Subir imagen</button>
+          
+                <img id='image'>
                 <textarea name="" id="post-description" rows="3" class="input-post" placeholder="¿Alguna reflexión?"></textarea>
-                <div class="upload-options">
-                    <div class="comment">
-                        <button id='btn-save'><i class="fas fa-save"></i>Guardar</button>
-                    </div>
-                    <div class="icon-image">
-                      <input type="file"></input>
-                    </div>
+                <div class="upload-options">  
+                  <button id='btn-save'><i class="fas fa-save"></i>&nbsp;Guardar</button>
+                  <input class="image-upload-input" type="file" id="post-image">  
+                  
                 </div>
             </form>
             <section class="card-container">
@@ -61,14 +62,23 @@ export default () => {
   divElement.classList.add('container');
   divElement.innerHTML = viewInicio;
 
-
   const postForm = divElement.querySelector('.upload-post');
   const cardsContainer = divElement.querySelector('.card-container');
-  const btnUpImage = divElement.querySelector('#upload-image');
+  const signOutBtn = divElement.querySelector('#sign-out-btn');
 
-  btnUpImage.addEventListener('click', () => {
+  let id = '';
+  let imageURL = '';
+
+  const nameLocal = localStorage.getItem('name');
+
+  /* --SUBIR IMAGEN CON STORAGE---*/
+  let file = postForm.querySelector('.image-upload-input');
+  const image = divElement.querySelector('#image');
+
+  file.addEventListener('change', () => {
+    file = file.files[0];
+
     const ref = firebase.storage().ref();
-    const file = postForm['post-image'].files[0];
     const name = file.name;
 
     const metadata = {
@@ -79,177 +89,132 @@ export default () => {
     task
       .then(snapshot => snapshot.ref.getDownloadURL())
       .then((url) => {
-        // eslint-disable-next-line no-console
-        console.log(url);
-        // eslint-disable-next-line no-alert
-        alert('Image upload successful');
-        const image = postForm.image;
+        /* console.log(url); */
         image.src = url;
+        imageURL = url;
       });
   });
 
-  let editStatus = false;
-  let id = '';
-  const db = firebase.firestore();
-  const savePost = (title, description) => db.collection('posts').doc().set({
-    title,
-    description,
-  });
-
-  // eslint-disable-next-line no-shadow
-  const getPost = id => db.collection('posts').doc(id).get();
-  const onGetPosts = callback => db.collection('posts').onSnapshot(callback);
-  // eslint-disable-next-line no-shadow
-  const deletePost = id => db.collection('posts').doc(id).delete();
-  // eslint-disable-next-line no-shadow
-  const updatePost = (id, updatedPost) => db.collection('posts').doc(id).update(updatedPost);
-
-  if (document.readyState !== 'loading') {
-    onGetPosts((querySnapshot) => {
+  /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
+  const templateCard = (data) => {
+    if (data.length) {
       cardsContainer.innerHTML = '';
-      querySnapshot.forEach((doc) => {
-        /* console.log(doc.data()); */
-        const post = doc.data();
-        post.id = doc.id;
+      data.forEach((element) => {
         cardsContainer.innerHTML += `
         <section class="card">
-          <div class="card-title"><img src="./img/ejemplo.jpg" alt="">${post.title}</div>
-          <div class="card-image"><img src="./img/ejemplo.jpg" alt=""></div>
-          <div class="card-description">${post.description}</div>
-          <div class="card-options">
-              <div class="like">
-                  <i class="fas fa-heart"></i>
-                  <span>12k</span>
-              </div>
-              <div class="comment">
-                  <i class="fas fa-comment"></i>
-                  <span>12k</span>
-              </div>
-              <div class="share">
-                  <i class="fas fa-share"></i>
-              </div>
+          <section class="card-title"><img src="./img/ejemplo.jpg" alt="">${element.name}</section>
+          <section class="card-image"><img src="${element.imageURL}" alt=""></section>
+          <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
+          <section class="card-options">
+              <section class="options-like-comment-share">
+                <div class="like">
+                    <i class="fas fa-heart"></i>
+                    <span>12k</span>
+                </div>
+                <div class="comment">
+                    <i class="fas fa-comment"></i>
+                    <span>12k</span>
+                </div>
+                <div class="share">
+                    <i class="fas fa-share"></i>
+                </div>
+              </section>
               <div class="btn-options">
-                <button class="btn-edit" data-id=${post.id}>Editar</button>
-                <button class="btn-delete" data-id=${post.id}>Eliminar</button>
+                <button class="btn-edit" data-id=${element.id}>Editar</button>
+                <button class="btn-update" data-id=${element.id}>Actualizar</button>
+                <button class="btn-delete" data-id=${element.id}>Eliminar</button>
               </div>
-          </div>
+          </section>
         </section>`;
+      });
 
-        const btnsDelete = document.querySelectorAll('.btn-delete');
-        btnsDelete.forEach((btn) => {
-          btn.addEventListener('click', async (e) => {
-            await deletePost(e.target.dataset.id);
-            /* console.log(e.target); */
-          });
-        });
-
-        const btnsEdit = document.querySelectorAll('.btn-edit');
-        btnsEdit.forEach((btn) => {
-          btn.addEventListener('click', async (e) => {
-            // eslint-disable-next-line no-shadow
-            const doc = await getPost(e.target.dataset.id);
-            // eslint-disable-next-line no-shadow
-            const post = doc.data();
-            /* console.log(e.target); */
-            editStatus = true;
-            id = doc.id;
-
-            postForm.querySelector('#post-title').value = post.title;
-            postForm.querySelector('#post-description').value = post.description;
-            postForm['btn-save'].innerText = 'Actualizar';
+      const btnsDelete = document.querySelectorAll('.btn-delete');
+      btnsDelete.forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          console.log(e.target);
+          await deletePost(e.target.dataset.id);
+          // eslint-disable-next-line no-shadow
+          await getPosts((data) => {
+            // console.log(data);
+            templateCard(data);
           });
         });
       });
-    });
-  } else {
-    // eslint-disable-next-line no-unused-vars
-    document.addEventListener('DOMContentLoaded', (e) => {
-      // eslint-disable-next-line no-console
-      console.log('No funciona!!');
-    });
-  }
+
+      const btnsEdit = document.querySelectorAll('.btn-edit');
+      const btnsUpdate = document.querySelectorAll('.btn-update');
+      btnsEdit.forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          const cardFather = e.target.closest('.card');
+          const input = cardFather.querySelector('#input-user-description');
+          const btnUpdate = cardFather.querySelector('.btn-update');
+          input.disabled = false;
+          // eslint-disable-next-line no-param-reassign
+          btn.style.display = 'none';
+          btnUpdate.style.display = 'flex';
+          input.focus();
+
+          id = e.target.dataset.id;
+        });
+      });
+
+      btnsUpdate.forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          // eslint-disable-next-line no-param-reassign
+          btn.style.display = 'block';
+          const cardFather = e.target.closest('.card');
+          const input = cardFather.querySelector('#input-user-description');
+
+          await updatePost(id, {
+            description: input.value,
+          });
+          input.disabled = true;
+          // eslint-disable-next-line no-shadow
+          await getPosts((data) => {
+            // console.log(data);
+            templateCard(data);
+          });
+        });
+      });
+    } else {
+      cardsContainer.innerHTML = ' <p> No hay publicaciones pendientes </p> ';
+    }
+  };
+  /* --GUARDAR EL POST EN EL FORM PRINCIPAL---*/
   postForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const title = postForm['post-title'];
-    // const title = postForm.querySelector('#post-title')
     const description = postForm['post-description'];
-
-    if (!editStatus) {
-      await savePost(title.value, description.value);
-    } else {
-      await updatePost(id, {
-        title: title.value,
-        description: description.value,
-      });
-      editStatus = false;
-      postForm['btn-save'].innerText = 'Guardar';
-    }
-    await getPosts();
+    await savePost(nameLocal, description.value, imageURL);
+    await getPosts((data) => {
+      // console.log(data);
+      templateCard(data);
+    });
     postForm.reset();
-    title.focus();
-    // console.log(title, description);
+    image.src = '';
   });
-  /*  const postsPublic = (data) => {
-    if (data.length) {
-
-      let html = '';
-      data.forEach((element) => {
-        const divCard = document.createElement('section');
-        divCard.classList.add('card')
-        const templade = `
-        <section class="card">
-          <div class="card-title"><img src="./img/ejemplo.jpg" alt="">${element.title}</div>
-          <div class="card-image"><img src="./img/ejemplo.jpg" alt=""></div>
-          <div class="card-description">${element.description}</div>
-          <div class="card-options">
-              <div class="like">
-                  <i class="fas fa-heart"></i>
-                  <span>12k</span>
-              </div>
-              <div class="comment">
-                  <i class="fas fa-comment"></i>
-                  <span>12k</span>
-              </div>
-              <div class="share">
-                  <i class="fas fa-share"></i>
-              </div>
-              <div class="btn-options">
-                <button id="btn-edit">Editar</button>
-                <button id="btn-delete">Eliminar</button>
-              </div>
-          </div>
-        </section>`;
-        divCard.innerHTML = templade;
-        html += templade;
-      });
-      cards.innerHTML = html;
-    } else {
-      cards.innerHTML = ' <p> No hay publicaciones pendientes </p> ';
-    }
-  };
 
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-      // fstore.collection('posts')
-      //   .get()
-      //   .then((snapshot) => {
-      //     // eslint-disable-next-line no-console
-      //     console.log(snapshot);
-      //     postsPublic(snapshot);
-      //     snapshot.forEach((doc) => {
-      //       // doc.data() is never undefined for query doc snapshots
-      //       console.log(doc.id, ' => ', doc.data());
-      //     });
-      //   });
+      /*  console.log('user', user); */
       getPosts((data) => {
-        console.log(data);
-        postsPublic(data);
+        // console.log(data);
+        templateCard(data);
       });
-
     } else {
       console.log('Estas fuera de sesion');
     }
-  }); */
+  });
+
+  /* --SALIR DE SESIÓN---*/
+  signOutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    signOut()
+      .then(() => {
+        console.log('signOut...');
+        window.location.hash = '#/';
+      });
+  });
+
   return divElement;
 };
