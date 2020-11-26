@@ -1,6 +1,9 @@
-
-import { getPosts } from '../controllers/firestore.js';
-
+import {
+  savePost,
+  getPosts,
+  deletePost,
+  updatePost,
+} from '../controllers/firestore.js';
 
 export default () => {
   const viewInicio = `
@@ -23,11 +26,12 @@ export default () => {
         <section class="main-container_section">
             <form class="upload-post">
           
-                <img id='image' width='100px'>
+                <img id='image'>
                 <textarea name="" id="post-description" rows="3" class="input-post" placeholder="¿Alguna reflexión?"></textarea>
                 <div class="upload-options">  
-                  <button id='btn-save'><i class="fas fa-save"></i>Guardar</button>
-                  <input type="file" id="post-image">  
+                  <button id='btn-save'><i class="fas fa-save"></i>&nbsp;Guardar</button>
+                  <input class="image-upload-input" type="file" id="post-image">  
+                  
                 </div>
             </form>
             <section class="card-container">
@@ -57,51 +61,23 @@ export default () => {
   divElement.classList.add('container');
   divElement.innerHTML = viewInicio;
 
-  const postForm = divElement.querySelector(".upload-post");
-  const cardsContainer = divElement.querySelector(".card-container");
-  const signOut = divElement.querySelector("#sign-out");
-
-  let editStatus = false;
-  let id = "";
-  let imageURL = "";
-
-  let nameLocal = localStorage.getItem("name");
-
-  /*--SUBIR IMAGEN CON STORAGE---*/
-  let file = postForm["post-image"];
-  const image = divElement.querySelector("#image");
-
-  file.addEventListener("change", () => {
-    file = file.files[0];
-    console.log("file", file);
-    if (file.length) {
-      const ref = firebase.storage().ref();
-      const name = file.name;
-
-      const metadata = {
-        contentType: file.type,
-      };
-
-      const task = ref.child(name).put(file, metadata);
-      task
-        .then((snapshot) => snapshot.ref.getDownloadURL())
-        .then((url) => {
-          /* console.log(url); */
-          image.src = url;
-          imageURL = url;
-        });
-    } else {
-      console.log("No hay ningun archivo");
-    }
-  });
-
   const postForm = divElement.querySelector('.upload-post');
   const cardsContainer = divElement.querySelector('.card-container');
-  const btnUpImage = divElement.querySelector('#upload-image');
+  const signOut = divElement.querySelector('#sign-out');
 
-  btnUpImage.addEventListener('click', () => {
+  let id = '';
+  let imageURL = '';
+
+  const nameLocal = localStorage.getItem('name');
+
+  /* --SUBIR IMAGEN CON STORAGE---*/
+  let file = postForm.querySelector('.image-upload-input');
+  const image = divElement.querySelector('#image');
+
+  file.addEventListener('change', () => {
+    file = file.files[0];
+
     const ref = firebase.storage().ref();
-    const file = postForm['post-image'].files[0];
     const name = file.name;
 
     const metadata = {
@@ -112,38 +88,29 @@ export default () => {
     task
       .then(snapshot => snapshot.ref.getDownloadURL())
       .then((url) => {
-        // eslint-disable-next-line no-console
-        console.log(url);
-        // eslint-disable-next-line no-alert
-        alert('Image upload successful');
-        const image = postForm.image;
+        /* console.log(url); */
         image.src = url;
+        imageURL = url;
       });
   });
 
-  let editStatus = false;
-  let id = '';
-  const db = firebase.firestore();
-  const savePost = (title, description) => db.collection('posts').doc().set({
-    title,
-    description,
+
+  signOut.addEventListener('click', (e) => {
+    e.preventDefault();
+    firebase
+      .auth()
+      .signOut()
+      .then(() => {
+        console.log('signOut...');
+        window.location.hash = '#/';
+      });
   });
 
-  // eslint-disable-next-line no-shadow
-  const getPost = id => db.collection('posts').doc(id).get();
-  const onGetPosts = callback => db.collection('posts').onSnapshot(callback);
-  // eslint-disable-next-line no-shadow
-  const deletePost = id => db.collection('posts').doc(id).delete();
-  // eslint-disable-next-line no-shadow
-  const updatePost = (id, updatedPost) => db.collection('posts').doc(id).update(updatedPost);
-
-  if (document.readyState !== 'loading') {
-    onGetPosts((querySnapshot) => {
+  /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
+  const templateCard = (data) => {
+    if (data.length) {
       cardsContainer.innerHTML = '';
-      querySnapshot.forEach((doc) => {
-        //console.log('rara',doc);
-        const post = doc.data();
-        post.id = doc.id;
+      data.forEach((element) => {
         cardsContainer.innerHTML += `
         <section class="card">
           <section class="card-title"><img src="./img/ejemplo.jpg" alt="">${nameLocal}</section>
@@ -165,132 +132,98 @@ export default () => {
               </section>
               <div class="btn-options">
                 <button class="btn-edit" data-id=${element.id}>Editar</button>
+                <button class="btn-update" data-id=${element.id}>Actualizar</button>
                 <button class="btn-delete" data-id=${element.id}>Eliminar</button>
               </div>
           </section>
         </section>`;
       });
 
-        const btnsDelete = document.querySelectorAll('.btn-delete');
-        btnsDelete.forEach((btn) => 
-                           
-          btn.addEventListener('click', async (e) => {
-          
-            await deletePost(e.target.dataset.id);
-            /* console.log(e.target); */
-          });
-        });
-
-        const btnsEdit = document.querySelectorAll('.btn-edit');
-        btnsEdit.forEach((btn) => {
-          
-          btn.addEventListener('click', async (e) => {
-            // eslint-disable-next-line no-shadow
-            const doc = await getPost(e.target.dataset.id);
-            // eslint-disable-next-line no-shadow
-
-            const post = doc.data();
-            /* const cardFather = e.target.closest('.card');
-            const form = cardFather.querySelector('.upload-post');
-            form.style.display = 'block'; */
-          /* console.log(e.target); */
-          editStatus = true;
-          id = e.target.dataset.id;
-
-          const cardFather = e.target.closest(".card");
-          const input = cardFather.querySelector("#input-user-description");
-          input.disabled = false;
-          input.focus();
-
-          btn.innerText = "Actualizar";
-
-            btn.innerText = "Actualizar";
-
-            postForm.querySelector('#post-title').value = post.title;
-            postForm.querySelector('#post-description').value = post.description;
-            postForm['btn-save'].innerText = 'Actualizar';
-
+      const btnsDelete = document.querySelectorAll('.btn-delete');
+      btnsDelete.forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          console.log(e.target);
+          await deletePost(e.target.dataset.id);
+          // eslint-disable-next-line no-shadow
+          await getPosts((data) => {
+            // console.log(data);
+            templateCard(data);
           });
         });
       });
-  } else {
-    // eslint-disable-next-line no-unused-vars
-    document.addEventListener('DOMContentLoaded', (e) => {
-      // eslint-disable-next-line no-console
-      console.log('No funciona!!');
-    });
-  }
+
+      const btnsEdit = document.querySelectorAll('.btn-edit');
+      const btnsUpdate = document.querySelectorAll('.btn-update');
+      btnsEdit.forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          const cardFather = e.target.closest('.card');
+          const input = cardFather.querySelector('#input-user-description');
+          const btnUpdate = cardFather.querySelector('.btn-update');
+          input.disabled = false;
+          // eslint-disable-next-line no-param-reassign
+          btn.style.display = 'none';
+          btnUpdate.style.display = 'flex';
+          input.focus();
+
+          id = e.target.dataset.id;
+        });
+      });
+
+      btnsUpdate.forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          // eslint-disable-next-line no-param-reassign
+          btn.style.display = 'block';
+          const cardFather = e.target.closest('.card');
+          const input = cardFather.querySelector('#input-user-description');
+
+          await updatePost(id, {
+            description: input.value,
+          });
+          input.disabled = true;
+          // eslint-disable-next-line no-shadow
+          await getPosts((data) => {
+            // console.log(data);
+            templateCard(data);
+          });
+        });
+      });
+    } else {
+      cardsContainer.innerHTML = ' <p> No hay publicaciones pendientes </p> ';
+    }
+  };
+  /* --GUARDAR EL POST EN EL FORM PRINCIPAL---*/
   postForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const title = postForm['post-title'];
-    // const title = postForm.querySelector('#post-title')
     const description = postForm['post-description'];
-
-    if (!editStatus) {
+    await savePost(imageURL, description.value);
+    /* if (!editStatus) {
       await savePost(imageURL, description.value);
     } else {
       await updatePost(id, {
-        title: title.value,
         description: description.value,
       });
       editStatus = false;
-      postForm['btn-save'].innerText = 'Guardar';
-
-    }
-    await getPosts();
+      postForm["btn-save"].innerText = "Guardar";
+    } */
+    await getPosts((data) => {
+      // console.log(data);
+      templateCard(data);
+    });
     postForm.reset();
-    title.focus();
-    // console.log(title, description);
+    image.src = '';
   });
-  /*  const postsPublic = (data) => {
-    if (data.length) {
-
-      let html = '';
-      data.forEach((element) => {
-        const divCard = document.createElement('section');
-        divCard.classList.add('card')
-        const templade = `
-        <section class="card">
-          <div class="card-title"><img src="./img/ejemplo.jpg" alt="">${element.title}</div>
-          <div class="card-image"><img src="./img/ejemplo.jpg" alt=""></div>
-          <div class="card-description">${element.description}</div>
-          <div class="card-options">
-              <div class="like">
-                  <i class="fas fa-heart"></i>
-                  <span>12k</span>
-              </div>
-              <div class="comment">
-                  <i class="fas fa-comment"></i>
-                  <span>12k</span>
-              </div>
-              <div class="share">
-                  <i class="fas fa-share"></i>
-              </div>
-              <div class="btn-options">
-                <button id="btn-edit">Editar</button>
-                <button id="btn-delete">Eliminar</button>
-              </div>
-          </div>
-        </section>`;
-        divCard.innerHTML = templade;
-        html += templade;
-      });
-      cards.innerHTML = html;
-    } else {
-      cards.innerHTML = ' <p> No hay publicaciones pendientes </p> ';
-    }
-  };
 
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
+      /*  console.log('user', user); */
       getPosts((data) => {
-        //console.log(data);
+        // console.log(data);
         templateCard(data);
       });
     } else {
-      console.log("Estas fuera de sesion");
+      console.log('Estas fuera de sesion');
     }
-  }); */
+  });
   return divElement;
 };
