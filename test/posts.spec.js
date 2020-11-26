@@ -33,6 +33,27 @@ describe('Guardar Post', () => {
   })));
 });
 
+describe.only('guardar post version 2', () => {
+  it('Deberia guardar el post', (done) => {
+    firebase.firestore().collection('posts').get()
+      .then((repsonse) => {
+        expect(repsonse._data.length).toBe(3);
+      })
+      .then(() => {
+        return savePost('Test', 'Nuevo post post_4', 'test.png')
+      })
+      .then(() => {
+        return firebase.firestore().collection('posts').get();
+      })
+      .then((posts) => {
+        const result = posts._data.find(docPost => docPost['_data'].name === 'Test');
+        expect(posts._data.length).toBe(4);
+        expect(result['_data'].name).toBe('Test');
+        done();
+      })
+  })
+})
+
 describe('Actualizar Post', () => {
   it('Debería actualizar el Post', done => updatePost('post_2', 'Hello World').then(() => getPosts((data) => {
     const result = data.find(post => post.id === 'post_2');
@@ -41,11 +62,11 @@ describe('Actualizar Post', () => {
   })));
 });
 
-/* describe('Eliminar Post', () => {
+describe('Eliminar Post', () => {
   it('Debería eliminar el Post', done => deletePost({ id: 'post_3' }).then(() => getPosts((data) => {
     const result = data.find(post => post.id === 'post_3');
     expect(result.id).toBe(undefined);
     done();
   })));
 });
- */
+ 

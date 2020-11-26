@@ -3,7 +3,7 @@ const signUp = (email, password) => firebase.auth().createUserWithEmailAndPasswo
 
 const signIn = (email, password) => firebase.auth().signInWithEmailAndPassword(email, password);
 
-const signInWithGoogle = provider => firebase.auth().signInWithPopup(provider);
+const signInWithGoogle = () => firebase.auth().signInWithPopup(provider);
 
 const signInWithFacebook = provider => firebase.auth().signInWithPopup(provider);
 
