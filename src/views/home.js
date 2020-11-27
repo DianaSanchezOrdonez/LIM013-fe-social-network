@@ -74,12 +74,13 @@ export default () => {
   /* --SUBIR IMAGEN CON STORAGE---*/
   let file = postForm.querySelector('.image-upload-input');
   const image = divElement.querySelector('#image');
+  const ref = firebase.storage().ref();
+  let name = '';
 
   file.addEventListener('change', () => {
     file = file.files[0];
-
-    const ref = firebase.storage().ref();
-    const name = file.name;
+    
+    name = file.name;
 
     const metadata = {
       contentType: file.type,
@@ -94,7 +95,8 @@ export default () => {
         imageURL = url;
       });
   });
-
+  /* --ELIMINAR LA IMAGEN TAMBIEN DEL STORAGE---*/
+  const deleteImage = (nameImage) => ref.child(nameImage).delete();
   /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
   const templateCard = (data) => {
     if (data.length) {
@@ -103,10 +105,10 @@ export default () => {
         cardsContainer.innerHTML += `
         <section class="card">
           <section class="card-title"><img src="./img/ejemplo.jpg" alt="">${element.name}</section>
-          <section class="card-image"><img src="${element.imageURL}" alt=""></section>
+          <section class="card-image"><img src="${element.imageURL}" alt="" data-filename=${name}></section>
           <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
           <section class="card-options">
-              <section class="options-like-comment-share">
+              <section class="options-like-comment">
                 <div class="like">
                     <i class="fas fa-heart"></i>
                     <span>12k</span>
@@ -115,9 +117,7 @@ export default () => {
                     <i class="fas fa-comment"></i>
                     <span>12k</span>
                 </div>
-                <div class="share">
-                    <i class="fas fa-share"></i>
-                </div>
+              
               </section>
               <div class="btn-options">
                 <button class="btn-edit" data-id=${element.id}>Editar</button>
@@ -131,8 +131,13 @@ export default () => {
       const btnsDelete = document.querySelectorAll('.btn-delete');
       btnsDelete.forEach((btn) => {
         btn.addEventListener('click', async (e) => {
-          console.log(e.target);
-          await deletePost(e.target.dataset.id);
+          const cardFather = e.target.closest('.card');
+          const cardImage = cardFather.querySelector('.card-image img');
+          cardImage.dataset.filename = name;
+          console.log('nameprueba', name);
+          /* console.log(e.target); */
+          await deletePost(e.target.dataset.id); 
+          await deleteImage(cardImage.dataset.filename)
           // eslint-disable-next-line no-shadow
           await getPosts((data) => {
             // console.log(data);
@@ -142,7 +147,6 @@ export default () => {
       });
 
       const btnsEdit = document.querySelectorAll('.btn-edit');
-      const btnsUpdate = document.querySelectorAll('.btn-update');
       btnsEdit.forEach((btn) => {
         btn.addEventListener('click', async (e) => {
           const cardFather = e.target.closest('.card');
@@ -158,6 +162,7 @@ export default () => {
         });
       });
 
+      const btnsUpdate = document.querySelectorAll('.btn-update');
       btnsUpdate.forEach((btn) => {
         btn.addEventListener('click', async (e) => {
           // eslint-disable-next-line no-param-reassign
@@ -180,6 +185,7 @@ export default () => {
       cardsContainer.innerHTML = ' <p> No hay publicaciones pendientes </p> ';
     }
   };
+
   /* --GUARDAR EL POST EN EL FORM PRINCIPAL---*/
   postForm.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -194,6 +200,7 @@ export default () => {
     image.src = '';
   });
 
+  /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
   firebase.auth().onAuthStateChanged((user) => {
     if (user) {
       /*  console.log('user', user); */
