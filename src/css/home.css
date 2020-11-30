@@ -29,6 +29,8 @@ body {
   display: flex;
   align-items: center;
   height: 100px;
+  position: fixed;
+  width: 100%;
 }
 .logo{
   flex-grow: 1;
@@ -227,11 +229,14 @@ body {
 .main-footer {
   background-color: var(--color-footer);
   color: var(--color-white);
-  line-height: 5;
+  line-height: 2.5;
   text-align: center;
   margin-top: auto;
+  height: 40px;
 }
+/*-----------SECTION NOT FOUND----------------*/
 
+/*-----------SECTION NOT FOUND----------------*/
 @media screen and (min-width: 730px) {
   /* .main-container_aside {
     background-color: tomato;
@@ -299,5 +304,4 @@ body {
     width: 150px;
     padding: 10px;
   }
-  
 }

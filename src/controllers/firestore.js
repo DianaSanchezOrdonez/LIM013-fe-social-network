@@ -47,5 +47,5 @@ export {
   signIn,
   signInWithGoogle,
   signInWithFacebook,
-  signOut
+  signOut,
 };

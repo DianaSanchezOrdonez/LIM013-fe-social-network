@@ -30,6 +30,8 @@ body {
   display: flex;
   align-items: center;
   height: 100px;
+  position: fixed;
+  width: 100%;
 }
 .logo{
   flex-grow: 1;
@@ -155,7 +157,7 @@ body {
   background-color: var(--color-white);
   width: 90%;
   /* height: 150px; */
-  margin: 5px 0 20px 0;
+  margin: 120px 0px 20px 0;
   padding: 20px;
   box-sizing: border-box;
   display: flex;
@@ -257,6 +259,10 @@ body {
 .like,
 .comment {
   padding: 0 10px;
+}
+.like i,
+.comment i{
+  cursor: pointer;
 }
 .btn-options{
   display: flex;
