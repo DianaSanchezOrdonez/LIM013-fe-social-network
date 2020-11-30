@@ -3,9 +3,15 @@ const signUp = (email, password) => firebase.auth().createUserWithEmailAndPasswo
 
 const signIn = (email, password) => firebase.auth().signInWithEmailAndPassword(email, password);
 
-const signInWithGoogle = provider => firebase.auth().signInWithPopup(provider);
+const signInWithGoogle = () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  return firebase.auth().signInWithPopup(provider);
+}
 
-const signInWithFacebook = provider => firebase.auth().signInWithPopup(provider);
+const signInWithFacebook = () => {
+  const provider = new firebase.auth.FacebookAuthProvider();
+  return firebase.auth().signInWithPopup(provider);
+}
 
 const signOut = () => firebase.auth().signOut();
 
@@ -28,10 +34,30 @@ const getPosts = callback => firebase
     callback(data);
   });
 
+ /*  function fireAddStudentToClassroom(studentUserId, classroomId) {
+
+    var db = firebase.firestore();
+    var studentsClassroomRef =
+        db.collection('student_class').doc(classroomId)
+          .collection('students');
+
+    studentsClassroomRef
+        .doc(studentUserId)
+        .set({})
+        .then(function () {
+            console.log('Document Added ');
+        })
+        .catch(function (error) {
+            console.error('Error adding document: ', error);
+        });
+} */
+
 const savePost = (name, description, imageURL) => firebase.firestore().collection('posts').doc().set({
   name,
   description,
   imageURL,
+}).collection('users').doc().set({
+  username: 'Diana123'
 });
 
 const deletePost = id => firebase.firestore().collection('posts').doc(id).delete();

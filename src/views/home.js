@@ -13,7 +13,7 @@ export default () => {
           <nav class="main-nav">
               <section class="action-img">
                   <div class="profile">
-                      <img src="img/ejemplo.jpg" alt="">
+                      <img src="" alt="">
                   </div>
                   <div class="menu">
                       <p>Bienvenidx<br><span></span></p>
@@ -75,18 +75,49 @@ export default () => {
 
   const nameLocal = localStorage.getItem('name');
 
+  /* --DESPLEGAR EL MENU---*/
+  const toggleMenu = divElement.querySelector('.menu');
+
+  const profileImg = divElement.querySelector('.profile');
+  profileImg.addEventListener('click', () => {
+    toggleMenu.classList.toggle('active');
+  });
+
+  /* --ESCONDER EL MENÚ AL HACER CLICK EN LA VENTANA---*/
+  const mainContainer = divElement.querySelector('.main-container')
+  mainContainer.addEventListener('click', () => {
+    toggleMenu.classList.remove('active');
+  })
+
+  /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
+  firebase.auth().onAuthStateChanged((user) => {
+    if (user) {
+      console.log('user', user); 
+      if( user.photoURL ){
+        profileImg.querySelector('img').src = user.photoURL
+      }else{
+        profileImg.querySelector('img').src = 'img/ejemplo.jpg'
+      }
+      /* const displayName = user.displayName;
+      const email = user.email;
+      const emailVerified = user.emailVerified;
+      const photoURL = user.photoURL;
+      const uid = user.uid; */
+
+      getPosts((data) => {
+        // console.log(data);
+        templateCard(data);
+      });
+    } else {
+      console.log('Estas fuera de sesion');
+    }
+  });
+
   /* --PINTAR EL NOMBRE DEL USUARIO ---*/
   const nameSpan = divElement.querySelector('.menu p span');
   const asideSpan = divElement.querySelector('.aside-title span');
   nameSpan.innerText = nameLocal;
   asideSpan.innerText = nameLocal;
-
-  /* --DESPLEGAR EL MENU---*/
-  const profileImg = divElement.querySelector('.profile');
-  profileImg.addEventListener('click', () => {
-    const toggleMenu = divElement.querySelector('.menu');
-    toggleMenu.classList.toggle('active');
-  });
 
   /* --SUBIR IMAGEN CON STORAGE---*/
   let file = postForm.querySelector('.image-upload-input');
@@ -154,7 +185,7 @@ export default () => {
           console.log('nameprueba', name);
           /* console.log(e.target); */
           await deletePost(e.target.dataset.id);
-          await deleteImage(cardImage.dataset.filename);
+          /* await deleteImage(cardImage.dataset.filename); */
           // eslint-disable-next-line no-shadow
           await getPosts((data) => {
             // console.log(data);
@@ -199,7 +230,7 @@ export default () => {
         });
       });
     } else {
-      cardsContainer.innerHTML = ' <p> No hay publicaciones pendientes </p> ';
+      cardsContainer.innerHTML = ' <img src="/img/icons8_empty_box_5.svg"><p> No hay publicaciones pendientes </p> ';
     }
   };
 
@@ -208,26 +239,13 @@ export default () => {
     e.preventDefault();
 
     const description = postForm['post-description'];
-    await savePost(nameLocal, description.value, imageURL);
+    await savePost(nameLocal, description.value, imageURL)
     await getPosts((data) => {
       // console.log(data);
       templateCard(data);
     });
     postForm.reset();
     image.src = '';
-  });
-
-  /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      /*  console.log('user', user); */
-      getPosts((data) => {
-        // console.log(data);
-        templateCard(data);
-      });
-    } else {
-      console.log('Estas fuera de sesion');
-    }
   });
 
   /* --SALIR DE SESIÓN---*/

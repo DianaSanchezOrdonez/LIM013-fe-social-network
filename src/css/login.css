@@ -53,7 +53,7 @@ body {
 }
 .action-img .profile {
   position: relative;
-  width: 80px;
+  width: 70px;
   height: 70px;
   border-radius: 50%;
   overflow: hidden;
@@ -148,7 +148,7 @@ body {
   background-color: var(--color-background);
   flex-grow: 1;
   display: flex;
-  justify-content: center;
+  /* justify-content: center; */
   align-items: center;
   color: var(--color-white);
   flex-direction: column;
@@ -196,6 +196,17 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.card-container img{
+  width: 300px;
+}
+.card-container p{
+  border-radius: 5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  background-color: rgba(240, 160, 0, 0.8);
+  padding: 10px;
+  color: var(--color-black);
 }
 .card {
   display: flex;
@@ -310,30 +321,39 @@ body {
 .container-login {
     display: flex;
     flex-direction: row;
-    height: 100vh;
-  /* justify-content: center; */
-  /* align-items: center; */
+    justify-content: center; 
+    align-items: center; 
 }
 .image {
-  /* width: 30%; */
-  /* height: 75%; */
+  position: relative;
+  width: 100%;
+  opacity: 30%;
   display: flex;
   height: 100vh;
   background-attachment: fixed;
-  /* background-color: red; */
 }
-.right-side{
+.right-side {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+/* .right-side{
   display: flex;
   width: 60vw;
-  /* justify-content: center; */
+  margin: 10px;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: 10px;
-}
+  
+} */
 .form-login {
-  width: 350px;
+  width: 250px;
+  margin: 0 35px;
 }
+/* .form-login {
+  width: 350px;
+} */
 .text-center {
   -webkit-text-stroke: 2px var(--color-yellow);
   color: var(--color-white);
@@ -347,13 +367,11 @@ body {
   margin: 10px 0px;
   width: 100%;
   text-align: center;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
 }
 .redes {
   color: var(--color-white);
-  font-size: 20px;
-  margin: 20px;
   text-align: center;
   padding: 3px;
 }
@@ -380,10 +398,10 @@ body {
   width: 100%;
 }
 label {
+    font-size: 14px;
     display: block;
     color: var(--color-footer);
     margin-bottom: 10px;
-    font-size: 18px;
     font-weight: 600;
 }
 .form-login input[type="text"],
@@ -414,17 +432,13 @@ label {
   margin-top: 10px;
   border: none;
   border-radius: 8px;
-  color: white;
-  background: #f6ad25;
+  color: var(--color-white);
+  background: var(--color-yellow);
   text-align: center;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: 0.5s;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  -ms-border-radius: 8px;
-  -o-border-radius: 8px;
 }
 .btn-login:hover {
   background: var(--color-yellow);
@@ -456,6 +470,18 @@ label {
     justify-content: center;
     align-items: center;
   } */
+  .container-login {
+    justify-content: normal;
+  }
+  .image {
+    opacity: 100%;
+    width: auto;
+  }
+  .right-side {
+    position: relative;
+    width: 60vw;
+    align-items: center;
+  }
   .input-post{
     margin: 10px 0 10px 0;
     font-size: 16px;
@@ -490,7 +516,7 @@ label {
   }
   .aside-post_section {
     background-color: var(--color-white);
-    margin-top: 20px;
+    margin-top: 120px;
     margin-right: 40px;
     padding: 30px 0;
     box-sizing: border-box;
@@ -517,6 +543,9 @@ label {
   .aside-post-img {
     width: 150px;
     padding: 10px;
+  }
+  .form-login {
+    width: 300px;
   }
   #input-user-name, #input-user-description{
     font-size: 18px;
