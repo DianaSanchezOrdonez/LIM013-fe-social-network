@@ -6,14 +6,13 @@ const changeView = (route) => {
   container.innerHTML = '';
   switch (route) {
     case '#/': { return container.appendChild(components.login()); }
-    case '': { return container.appendChild(components.login()); }
     case '#': { return container.appendChild(components.login()); }
+    case '': { return container.appendChild(components.login()); }
     case '#/home': { return container.appendChild(components.home()); }
     case '#/register': { return container.appendChild(components.register()); }
     default:
-      break;
+      return container.appendChild(components.notfound())
   }
-  // eslint-disable-next-line no-console
   /* console.log(route); */
 };
 
