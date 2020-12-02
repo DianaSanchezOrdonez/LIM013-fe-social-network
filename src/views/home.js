@@ -121,54 +121,83 @@ export default () => {
   });
   /* --ELIMINAR LA IMAGEN TAMBIEN DEL STORAGE---*/
   const deleteImage = nameImage => ref.child(nameImage).delete().catch( error => console.log(error));
+
   /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
   const templateCard = (data) => {
     if (data.length) {
       cardsContainer.innerHTML = '';
       data.forEach((element) => {
-        cardsContainer.innerHTML += `
-        <section class="card">
-          <section class="card-title"><img src="img/ejemplo.jpg" alt="">${element.name}</section>
-          <section class="card-image"><img src="${element.imageURL}" alt="" data-filename=${name}></section>
-          <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
-          <section class="card-options">
-              <section class="options-like-comment">
-                <div class="like">
-                    <i class="fas fa-heart"></i>
-                    <span>12k</span>
-                </div>
-                <div class="comment">
-                    <i class="fas fa-comment"></i>
-                    <span>12k</span>
-                </div>
+        if(!element.imageURL){
+          cardsContainer.innerHTML += `
+            <section class="card" data-id=${element.id}>
+              <section class="card-title"><img src="img/ejemplo.jpg" alt="">${element.name}</section>
+              <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
+              <section class="card-options">
+                  <section class="options-like-comment">
+                    <div class="like">
+                        <i class="fas fa-heart"></i>
+                        <span>12k</span>
+                    </div>
+                    <div class="comment">
+                        <i class="fas fa-comment"></i>
+                        <span>12k</span>
+                    </div>
+                  </section>
+                  <div class="btn-options">
+                    <button class="btn-edit" >Editar</button>
+                    <button class="btn-update" >Actualizar</button>
+                    <button class="btn-delete" >Eliminar</button>
+                  </div>
               </section>
-              <div class="btn-options">
-                <button class="btn-edit" data-id=${element.id}>Editar</button>
-                <button class="btn-update" data-id=${element.id}>Actualizar</button>
-                <button class="btn-delete" data-id=${element.id}>Eliminar</button>
+              <div class="comment_section">
+                  <span>${nameLocal}</span><input id="comment-input" type="text">
               </div>
-          </section>
-          <div class="comment_section">
-              <span>${nameLocal}</span><input id="comment-input" type="text">
-          </div>
-          <section class="comments">
-            
-          </section>
-        </section>`;
+              <section class="comments">
+                
+              </section>
+            </section>`;
+        }else{
+          cardsContainer.innerHTML += `
+          <section class="card" data-id=${element.id}>
+            <section class="card-title"><img src="img/ejemplo.jpg" alt="">${element.name}</section>
+            <section class="card-image"><img src="${element.imageURL}" alt="" data-filename=${name}></section>
+            <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
+            <section class="card-options">
+                <section class="options-like-comment">
+                  <div class="like">
+                      <i class="fas fa-heart"></i>
+                      <span>12k</span>
+                  </div>
+                  <div class="comment">
+                      <i class="fas fa-comment"></i>
+                      <span>12k</span>
+                  </div>
+                </section>
+                <div class="btn-options">
+                  <button class="btn-edit" >Editar</button>
+                  <button class="btn-update" >Actualizar</button>
+                  <button class="btn-delete" >Eliminar</button>
+                </div>
+            </section>
+            <div class="comment_section">
+                <span>${nameLocal}</span><input id="comment-input" type="text">
+            </div>
+            <section class="comments">
+              
+            </section>
+          </section>`;
+        }
       });
-
-       /* <div class="comment_section_two">
-                <span>${nameLocal}</span><label id="comment-label" for=""></label>
-              </div> */
 
       const commentInputs = cardsContainer.querySelectorAll('#comment-input');
       commentInputs.forEach((input) => {
         input.addEventListener('keypress', async(e) => {
           const cardFather = e.target.closest('.card');
           const comments = cardFather.querySelector('.comments');
+          const idCard = cardFather.dataset.id;
           /* comments.innerHTML = ''; */
           if(e.keyCode === 13) {
-            await saveComment(nameLocal, e.target.value)
+            await saveComment(nameLocal, e.target.value, idCard)
             comments.innerHTML = `
               <div class="comment_section_two">
                   <span>${nameLocal}</span><label id="comment-label" for="">${e.target.value}</label>
@@ -178,28 +207,30 @@ export default () => {
         })
       })
 
-      const btnsDelete = document.querySelectorAll('.btn-delete');
+      btnsDelete = document.querySelectorAll('.btn-delete');
       btnsDelete.forEach((btn) => {
         btn.addEventListener('click', async (e) => {
           const cardFather = e.target.closest('.card');
           const cardImage = cardFather.querySelector('.card-image img');
+          const idCard = cardFather.dataset.id;
           cardImage.dataset.filename = name;
-          console.log('nameprueba', name);
+          /* console.log('nameprueba', name); */
           /* console.log(e.target); */
-          await deletePost(e.target.dataset.id); 
+          await deletePost(idCard); 
          /*  await deleteImage(cardImage.dataset.filename);  */
           // eslint-disable-next-line no-shadow
           await getPosts((data) => {
-            // console.log(data);
             templateCard(data);
           });
         });
       });
-
-      const btnsEdit = document.querySelectorAll('.btn-edit');
+      
+      btnsEdit = document.querySelectorAll('.btn-edit');
       btnsEdit.forEach((btn) => {
         btn.addEventListener('click', async (e) => {
+          
           const cardFather = e.target.closest('.card');
+          const idCard = cardFather.dataset.id;
           const input = cardFather.querySelector('#input-user-description');
           const btnUpdate = cardFather.querySelector('.btn-update');
           input.disabled = false;
@@ -208,7 +239,7 @@ export default () => {
           btnUpdate.style.display = 'flex';
           input.focus();
 
-          id = e.target.dataset.id;
+          id = idCard;
         });
       });
 
@@ -226,7 +257,6 @@ export default () => {
           input.disabled = true;
           // eslint-disable-next-line no-shadow
           await getPosts((data) => {
-            // console.log(data);
             templateCard(data);
           });
         });
@@ -243,20 +273,7 @@ export default () => {
     }
   };
 
-  /* --GUARDAR EL POST EN EL FORM PRINCIPAL---*/
-  postForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const description = postForm['post-description'];
-    await savePost(nameLocal, description.value, imageURL)
-    await getPosts((data) => {
-      // console.log(data);
-      templateCard(data);
-    });
-    postForm.reset();
-    image.src = '';
-  });
-
+  let uid = '';
   /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
   const photoAside = divElement.querySelector('.aside-title img');
   /* const photoimgCard = cardsContainer.querySelector('.card-title img'); */
@@ -272,12 +289,13 @@ export default () => {
         photoAside.src = 'img/ejemplo.jpg';
         /* photoimgCard.src = 'img/ejemplo.jpg' */
       }
+      uid = user.uid;
       /* const displayName = user.displayName;
       const email = user.email;
       const emailVerified = user.emailVerified;
       const photoURL = user.photoURL;
       const uid = user.uid; */
-      
+
       getPosts((data) => {
         /* data.forEach(async(post) => {
           await fireAddSubcollection( user.uid, user.displayName, user.email, post.id) 
@@ -287,6 +305,20 @@ export default () => {
     } else {
       console.log('Estas fuera de sesion');
     }
+  });
+
+  /* --GUARDAR EL POST EN EL FORM PRINCIPAL---*/
+  postForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const description = postForm['post-description'];
+    await savePost(nameLocal, description.value, imageURL, uid)
+    await getPosts((data) => {
+      // console.log(data);
+      templateCard(data);
+    });
+    postForm.reset();
+    image.src = '';
   });
 
   /* --SALIR DE SESIÓN---*/

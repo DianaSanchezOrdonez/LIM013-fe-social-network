@@ -32,16 +32,18 @@ const getPosts = (callback) =>
           name: doc.data().name,
           description: doc.data().description,
           imageURL: doc.data().imageURL,
+          uid: doc.data().uid
         });
       });
       callback(data);
     });
 
-const savePost = (name, description, imageURL) =>
+const savePost = (name, description, imageURL, uid) =>
   firebase.firestore().collection("posts").doc().set({
     name,
     description,
     imageURL,
+    uid
   });
 
 const deletePost = (id) =>
@@ -51,10 +53,11 @@ const updatePost = (id, updatedPost) =>
   firebase.firestore().collection("posts").doc(id).update(updatedPost);
 
 /**----------GUARDANDO COMENTARIOS----------------------- */
-const saveComment = (username, comment) => 
+const saveComment = (username, comment, refpost) => 
   firebase.firestore().collection('comments').doc().set({
     username,
-    comment
+    comment,
+    refpost
   })
 
 /*-----------AGREGANDO SUBCOLLECTION----------------------*/
