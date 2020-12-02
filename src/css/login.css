@@ -144,7 +144,7 @@ body {
   flex-direction: column;
   flex-grow: 1;
 }
-.main-container_section, .main-container_section_notfound {
+.main-container_section, .main-container_section_notfound , .main-container_section_profile {
   background-color: var(--color-background);
   flex-grow: 1;
   display: flex;
@@ -275,7 +275,7 @@ body {
 .btn-options{
   display: flex;
 }
-.btn-edit, .btn-delete, .btn-update {
+.btn-edit, .btn-delete, .btn-update, .btn-editar-profile {
   width: 80px;
   margin-right: 5px;
   padding: 8px;
@@ -311,25 +311,26 @@ body {
 .btn-delete:hover {
   background-color: rgba(240, 160, 0, 0.8);
 }
+/*------------PROFILE------------------------*/
 .comments {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
 }
-.comment_section {
+.comment_section, .comment_section_two {
   display: flex;
   padding: 0 20px;
   margin-bottom: 10px;
   align-items: center;
 }
-.comment_section span {
+.comment_section span, .comment_section_two span {
   font-weight: 600;
   font-style: italic;
   width: 100px;
   color: var(--color-black);
 }
-.comment_section input, .comment_section label {
+.comment_section input, .comment_section label, .comment_section_two label {
   width: calc(100% - 100px);
   padding: 5px;
   color: var(--color-footer);
@@ -357,11 +358,27 @@ body {
   font-weight: 600;
   font-style: italic;
 }
-.card p {
-  color: var(--color-black)
+.main-container_section_profile .card p {
+  font-size: 20px;
+  padding: 20px;
+  color: var(--color-black);
 }
-.card img {
-  object-fit: contain;
+.main-container_aside_profile .card img {
+  width: 250px;
+  border-radius: 50%;
+  padding-top: 20px;
+  align-self: center
+}
+.img-card-profile {
+  width: 350px;
+  object-fit: contain; 
+  align-self: center;
+}
+.btn-editar-profile {
+  padding: 10px;
+  width: 100%;
+  background-color: var(--color-yellow);
+  color: var(--color-white)
 }
 /*------------LOGIN------------------------*/
 .container-login {
@@ -532,8 +549,9 @@ body {
     margin: 10px 0 10px 0;
     font-size: 16px;
   }
-  .card {
+  .card img{
     /* height: 450px; */
+    object-fit: contain;
   }
   .card-image img {
     height: 280px;
@@ -609,5 +627,18 @@ body {
   }
   #input-user-name, #input-user-description{
     font-size: 18px;
+  }
+  .main-container_aside_profile {
+    align-items: flex-start;
+    width: 40%;
+  }
+  .main-container_aside_profile .card img {
+    padding: 25px;
+  }
+  .main-container_aside_profile .card p, .main-container_section_profile .card p {
+    font-size: 16px;
+  }
+  .main-container_section_profile {
+    padding-top: 120px;
   }
 }

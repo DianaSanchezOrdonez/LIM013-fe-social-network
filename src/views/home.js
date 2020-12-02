@@ -5,6 +5,7 @@ import {
   updatePost,
   fireAddSubcollection,
   signOut,
+  saveComment
 } from '../controllers/firestore.js';
 
 export default () => {
@@ -20,9 +21,9 @@ export default () => {
                       <p>Bienvenidx<br><span></span></p>
                       <ul>
                           <li><i class="fas fa-home"></i><a href="#/home">Inicio</a></li>
-                          <li><i class="fas fa-users"></i><a href="#contactos">Contactos</a></li>
-                          <li><i class="fas fa-grin-alt"></i><a href="#perfil">Perfil</a></li>
-                          <li><i class="fas fa-sign-out-alt"></i><a href="#" id="sign-out-btn">Cerrar Sesión</a></li>
+                          <li><i class="fas fa-users"></i><a href="#/contactos">Contactos</a></li>
+                          <li><i class="fas fa-grin-alt"></i><a href="#/profile">Perfil</a></li>
+                          <li><i class="fas fa-sign-out-alt"></i><a href="#/" id="sign-out-btn">Cerrar Sesión</a></li>
                       </ul>
                   </div>
               </section>
@@ -147,16 +148,35 @@ export default () => {
                 <button class="btn-delete" data-id=${element.id}>Eliminar</button>
               </div>
           </section>
+          <div class="comment_section">
+              <span>${nameLocal}</span><input id="comment-input" type="text">
+          </div>
           <section class="comments">
-              <div class="comment_section">
-                <span>Diana123</span><input type="text">
-              </div>
-              <div class="comment_section">
-                <span>Diana123</span><label for="">Diana aprendiendo....</label>
-              </div>
+            
           </section>
         </section>`;
       });
+
+       /* <div class="comment_section_two">
+                <span>${nameLocal}</span><label id="comment-label" for=""></label>
+              </div> */
+
+      const commentInputs = cardsContainer.querySelectorAll('#comment-input');
+      commentInputs.forEach((input) => {
+        input.addEventListener('keypress', async(e) => {
+          const cardFather = e.target.closest('.card');
+          const comments = cardFather.querySelector('.comments');
+          /* comments.innerHTML = ''; */
+          if(e.keyCode === 13) {
+            await saveComment(nameLocal, e.target.value)
+            comments.innerHTML = `
+              <div class="comment_section_two">
+                  <span>${nameLocal}</span><label id="comment-label" for="">${e.target.value}</label>
+              </div>
+            `
+          } 
+        })
+      })
 
       const btnsDelete = document.querySelectorAll('.btn-delete');
       btnsDelete.forEach((btn) => {
@@ -259,9 +279,9 @@ export default () => {
       const uid = user.uid; */
       
       getPosts((data) => {
-        data.forEach(async(post) => {
+        /* data.forEach(async(post) => {
           await fireAddSubcollection( user.uid, user.displayName, user.email, post.id) 
-        })
+        }) */
         templateCard(data);
       });
     } else {

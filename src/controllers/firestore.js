@@ -50,6 +50,13 @@ const deletePost = (id) =>
 const updatePost = (id, updatedPost) =>
   firebase.firestore().collection("posts").doc(id).update(updatedPost);
 
+/**----------GUARDANDO COMENTARIOS----------------------- */
+const saveComment = (username, comment) => 
+  firebase.firestore().collection('comments').doc().set({
+    username,
+    comment
+  })
+
 /*-----------AGREGANDO SUBCOLLECTION----------------------*/
 const fireAddSubcollection = (uid, username, useremail, postId) => {
   const commentsPostRef = firebase
@@ -80,4 +87,5 @@ export {
   signInWithGoogle,
   signInWithFacebook,
   signOut,
+  saveComment
 };
