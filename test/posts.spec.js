@@ -11,14 +11,14 @@ const fixtureData = {
     posts: {
       __doc__: {
         post_1: {
+          name: 'Giovand',
           description: 'aprendi a cocinar',
-          imagenURL: '',
-          name: 'Giovand'
+          imagenURL: ''
         },
         post_2: {
+          name: 'Diana',
           description: 'aprendi a pintar',
-          imagenURL: '',
-          name: 'Diana'
+          imageURL: ''
         },
       },
     },
@@ -36,7 +36,7 @@ describe('Guardar post 3', () => {
         expect(response._data.length).toBe(2);
       })
       .then(() => {
-        return savePost('Nuevo post post_3', 'ejemplo.png', 'Post_3')
+        return savePost('Post_3','Nuevo post post_3', 'ejemplo.png')
       })
       .then(() => {
         return firebase.firestore().collection('posts').get();
@@ -57,7 +57,7 @@ describe('Guardar post 4', () => {
         expect(response._data.length).toBe(3);
       })
       .then(() => {
-        return savePost('Nuevo post post_4', 'test.png', 'Test')
+        return savePost('Test','Nuevo post post_4', 'test.png')
       })
       .then(() => {
         return firebase.firestore().collection('posts').get();
@@ -91,7 +91,7 @@ describe('Actualizar post_02', () => {
 
 /*-------------------Test deletePost version 02-------------------------------*/
 
-describe.skip('Eliminar post_1', () => {
+describe('Eliminar post_1', () => {
   it('Deberia eliminar el post', (done) => {
     firebase.firestore().collection('posts').get()
       .then((response) => {
@@ -112,7 +112,7 @@ describe.skip('Eliminar post_1', () => {
   })
 })
 
-describe.skip('Eliminar post_02', () => {
+describe('Eliminar post_02', () => {
   it('Deberia eliminar el post', (done) => {
     firebase.firestore().collection('posts').get()
       .then((response) => {

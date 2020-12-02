@@ -236,12 +236,10 @@ body {
 .card-title img,
 .aside-title img {
   width: 60px;
-  padding: 0 10px 0 0;
   border-radius: 50%;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  -ms-border-radius: 50%;
-  -o-border-radius: 50%;
+}
+.card-title img {
+  margin-right: 10px;
 }
 .card-image {
   flex-grow: 2;
@@ -313,8 +311,57 @@ body {
 .btn-delete:hover {
   background-color: rgba(240, 160, 0, 0.8);
 }
+.comments {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+}
+.comment_section {
+  display: flex;
+  padding: 0 20px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.comment_section span {
+  font-weight: 600;
+  font-style: italic;
+  width: 100px;
+  color: var(--color-black);
+}
+.comment_section input, .comment_section label {
+  width: calc(100% - 100px);
+  padding: 5px;
+  color: var(--color-footer);
+}
 .main-container_aside {
   display: none;
+}
+.main-container_aside_profile {
+  background-color: var(--color-background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 120px;
+}
+.card-profileinfo {
+  padding: 20px;
+  font-size: 20px;
+}
+.card-profileinfo p {
+  margin: 15px 0px
+}
+.card-profileinfo h3 {
+  text-align: center;
+  font-size: 25px;
+  font-weight: 600;
+  font-style: italic;
+}
+.card p {
+  color: var(--color-black)
+}
+.card img {
+  object-fit: contain;
 }
 /*------------LOGIN------------------------*/
 .container-login {
@@ -396,7 +443,7 @@ body {
 .input-container {
   width: 100%;
 }
-label {
+.input-container label {
     font-size: 14px;
     display: block;
     color: var(--color-footer);
@@ -486,7 +533,7 @@ label {
     font-size: 16px;
   }
   .card {
-    height: 450px;
+    /* height: 450px; */
   }
   .card-image img {
     height: 280px;
@@ -494,6 +541,7 @@ label {
     /* object-position: 30% 5%; */
   }
   .main-container_section_notfound img {
+    margin-top: 70px;
     width: 350px;
   }
   .main-footer{
@@ -530,6 +578,10 @@ label {
     padding: 0 40px;
     font-size: 25px;
     font-weight: 600;
+    height: 80px
+  }
+  .aside-title span {
+    margin-left: 10px;
   }
   .aside-description {
     display: block;

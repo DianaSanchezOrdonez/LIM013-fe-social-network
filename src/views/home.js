@@ -3,6 +3,7 @@ import {
   getPosts,
   deletePost,
   updatePost,
+  fireAddSubcollection,
   signOut,
 } from '../controllers/firestore.js';
 
@@ -30,13 +31,11 @@ export default () => {
     <main class="main-container">
         <section class="main-container_section">
             <form class="upload-post">
-          
                 <img id='image'>
                 <textarea name="" id="post-description" rows="3" class="input-post" placeholder="¿Alguna reflexión?"></textarea>
                 <div class="upload-options">  
                   <button id='btn-save'><i class="fas fa-save"></i>&nbsp;Guardar</button>
                   <input class="image-upload-input" type="file" id="post-image">  
-                  
                 </div>
             </form>
             <section class="card-container">
@@ -46,7 +45,7 @@ export default () => {
         <aside class="main-container_aside">
             <section class="aside-post_section">
                 <div class="aside-title">
-                    <img src="./img/ejemplo.jpg" alt=""><span><span>
+                    <img src=""><span><span>
                 </div>
                 <p class="aside-description">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Architecto, qui!</p>
                 <div class="aside-post">
@@ -89,30 +88,6 @@ export default () => {
     toggleMenu.classList.remove('active');
   })
 
-  /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
-  firebase.auth().onAuthStateChanged((user) => {
-    if (user) {
-      console.log('user', user); 
-      if( user.photoURL ){
-        profileImg.querySelector('img').src = user.photoURL
-      }else{
-        profileImg.querySelector('img').src = 'img/ejemplo.jpg'
-      }
-      /* const displayName = user.displayName;
-      const email = user.email;
-      const emailVerified = user.emailVerified;
-      const photoURL = user.photoURL;
-      const uid = user.uid; */
-
-      getPosts((data) => {
-        // console.log(data);
-        templateCard(data);
-      });
-    } else {
-      console.log('Estas fuera de sesion');
-    }
-  });
-
   /* --PINTAR EL NOMBRE DEL USUARIO ---*/
   const nameSpan = divElement.querySelector('.menu p span');
   const asideSpan = divElement.querySelector('.aside-title span');
@@ -144,7 +119,7 @@ export default () => {
       });
   });
   /* --ELIMINAR LA IMAGEN TAMBIEN DEL STORAGE---*/
-  const deleteImage = nameImage => ref.child(nameImage).delete();
+  const deleteImage = nameImage => ref.child(nameImage).delete().catch( error => console.log(error));
   /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
   const templateCard = (data) => {
     if (data.length) {
@@ -152,7 +127,7 @@ export default () => {
       data.forEach((element) => {
         cardsContainer.innerHTML += `
         <section class="card">
-          <section class="card-title"><img src="./img/ejemplo.jpg" alt="">${element.name}</section>
+          <section class="card-title"><img src="img/ejemplo.jpg" alt="">${element.name}</section>
           <section class="card-image"><img src="${element.imageURL}" alt="" data-filename=${name}></section>
           <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
           <section class="card-options">
@@ -165,12 +140,19 @@ export default () => {
                     <i class="fas fa-comment"></i>
                     <span>12k</span>
                 </div>
-              
               </section>
               <div class="btn-options">
                 <button class="btn-edit" data-id=${element.id}>Editar</button>
                 <button class="btn-update" data-id=${element.id}>Actualizar</button>
                 <button class="btn-delete" data-id=${element.id}>Eliminar</button>
+              </div>
+          </section>
+          <section class="comments">
+              <div class="comment_section">
+                <span>Diana123</span><input type="text">
+              </div>
+              <div class="comment_section">
+                <span>Diana123</span><label for="">Diana aprendiendo....</label>
               </div>
           </section>
         </section>`;
@@ -184,8 +166,8 @@ export default () => {
           cardImage.dataset.filename = name;
           console.log('nameprueba', name);
           /* console.log(e.target); */
-          await deletePost(e.target.dataset.id);
-          /* await deleteImage(cardImage.dataset.filename); */
+          await deletePost(e.target.dataset.id); 
+         /*  await deleteImage(cardImage.dataset.filename);  */
           // eslint-disable-next-line no-shadow
           await getPosts((data) => {
             // console.log(data);
@@ -229,6 +211,13 @@ export default () => {
           });
         });
       });
+
+      const likesCard = document.querySelectorAll('.like i');
+      likesCard.forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          console.log(e.target);
+        })
+      })
     } else {
       cardsContainer.innerHTML = ' <img src="/img/icons8_empty_box_5.svg"><p> No hay publicaciones pendientes </p> ';
     }
@@ -246,6 +235,38 @@ export default () => {
     });
     postForm.reset();
     image.src = '';
+  });
+
+  /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
+  const photoAside = divElement.querySelector('.aside-title img');
+  /* const photoimgCard = cardsContainer.querySelector('.card-title img'); */
+  firebase.auth().onAuthStateChanged( (user) => {
+    if (user) {
+      /* console.log('user', user);  */
+      if( user.photoURL ){
+        profileImg.querySelector('img').src = user.photoURL;
+        photoAside.src = user.photoURL;
+        /* photoimgCard.src = user.photoURL; */
+      }else{
+        profileImg.querySelector('img').src = 'img/ejemplo.jpg';
+        photoAside.src = 'img/ejemplo.jpg';
+        /* photoimgCard.src = 'img/ejemplo.jpg' */
+      }
+      /* const displayName = user.displayName;
+      const email = user.email;
+      const emailVerified = user.emailVerified;
+      const photoURL = user.photoURL;
+      const uid = user.uid; */
+      
+      getPosts((data) => {
+        data.forEach(async(post) => {
+          await fireAddSubcollection( user.uid, user.displayName, user.email, post.id) 
+        })
+        templateCard(data);
+      });
+    } else {
+      console.log('Estas fuera de sesion');
+    }
   });
 
   /* --SALIR DE SESIÓN---*/
