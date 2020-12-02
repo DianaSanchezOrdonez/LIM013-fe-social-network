@@ -1,3 +1,4 @@
+/* eslint-disable import/named */
 // importamos la funcion que vamos a testear
 // import { myFunction } from "../src/lib/index";
 import firebasemock from 'firebase-mock';
