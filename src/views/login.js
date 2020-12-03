@@ -122,7 +122,6 @@ export default () => {
       // eslint-disable-next-line no-console
         .catch(error => console.log('error', error));
     });
-
-    return divElement;
   });
+  return divElement;
 };

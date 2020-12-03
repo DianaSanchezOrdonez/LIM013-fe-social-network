@@ -5,12 +5,14 @@ import Register from './register.js';
 import Perfil from './perfil.js'
 import inicio from './inicio.js' */
 import Different from './404.js';
+import Profile from './profile.js';
 
 const components = {
   login: Login,
   home: Inicio,
   register: Register,
   different: Different,
+  profile: Profile,
 };
 
 export { components };
