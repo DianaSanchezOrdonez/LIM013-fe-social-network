@@ -5,7 +5,8 @@ import {
   updatePost,
   fireAddSubcollection,
   signOut,
-  saveComment
+  saveComment,
+  getComments
 } from '../controllers/firestore.js';
 
 export default () => {
@@ -33,7 +34,7 @@ export default () => {
         <section class="main-container_section">
             <form class="upload-post">
                 <img id='image'>
-                <textarea name="" id="post-description" rows="3" class="input-post" placeholder="¿Alguna reflexión?"></textarea>
+                <textarea name="" id="post-description" rows="3" class="input-post" placeholder="¿Alguna reflexión?" required></textarea>
                 <div class="upload-options">  
                   <button id='btn-save'><i class="fas fa-save"></i>&nbsp;Guardar</button>
                   <input class="image-upload-input" type="file" id="post-image">  
@@ -129,7 +130,7 @@ export default () => {
       data.forEach((element) => {
         if(!element.imageURL){
           cardsContainer.innerHTML += `
-            <section class="card" data-id=${element.id}>
+            <section class="card" data-id=${element.id} >
               <section class="card-title"><img src="img/ejemplo.jpg" alt="">${element.name}</section>
               <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
               <section class="card-options">
@@ -143,22 +144,19 @@ export default () => {
                         <span>12k</span>
                     </div>
                   </section>
-                  <div class="btn-options">
-                    <button class="btn-edit" >Editar</button>
-                    <button class="btn-update" >Actualizar</button>
-                    <button class="btn-delete" >Eliminar</button>
-                  </div>
+                  ${ element.uid === firebase.auth().currentUser.uid ? '<div class="btn-options"><button class="btn-edit" >Editar</button> <button class="btn-update" >Actualizar</button><button class="btn-delete" >Eliminar</button></div>' :  ''}
               </section>
               <div class="comment_section">
                   <span>${nameLocal}</span><input id="comment-input" type="text">
               </div>
+              
               <section class="comments">
                 
               </section>
             </section>`;
         }else{
           cardsContainer.innerHTML += `
-          <section class="card" data-id=${element.id}>
+          <section class="card" data-id=${element.id} data-uid=${element.uid}>
             <section class="card-title"><img src="img/ejemplo.jpg" alt="">${element.name}</section>
             <section class="card-image"><img src="${element.imageURL}" alt="" data-filename=${name}></section>
             <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
@@ -173,11 +171,7 @@ export default () => {
                       <span>12k</span>
                   </div>
                 </section>
-                <div class="btn-options">
-                  <button class="btn-edit" >Editar</button>
-                  <button class="btn-update" >Actualizar</button>
-                  <button class="btn-delete" >Eliminar</button>
-                </div>
+                ${ element.uid === firebase.auth().currentUser.uid ? '<div class="btn-options"><button class="btn-edit" >Editar</button> <button class="btn-update" >Actualizar</button><button class="btn-delete" >Eliminar</button></div>' :  ''}
             </section>
             <div class="comment_section">
                 <span>${nameLocal}</span><input id="comment-input" type="text">
@@ -204,20 +198,32 @@ export default () => {
               </div>
             `
           } 
+
+          /* --TRAER LA DATA DE LOS COMENTARIOS ---*/
+          getComments(idCard).then(data => {
+            comments.innerHTML = '';
+            data.forEach((doc) => {
+              comments.innerHTML = `
+              <div class="comment_section_two">
+                  <span>${doc.username}</span><label id="comment-label" for="">${doc.comment}</label>
+              </div>
+            `
+            })
+
+          })
         })
       })
 
-      btnsDelete = document.querySelectorAll('.btn-delete');
+      const btnsDelete = document.querySelectorAll('.btn-delete');
       btnsDelete.forEach((btn) => {
         btn.addEventListener('click', async (e) => {
           const cardFather = e.target.closest('.card');
           const cardImage = cardFather.querySelector('.card-image img');
           const idCard = cardFather.dataset.id;
           cardImage.dataset.filename = name;
-          /* console.log('nameprueba', name); */
-          /* console.log(e.target); */
+
           await deletePost(idCard); 
-         /*  await deleteImage(cardImage.dataset.filename);  */
+          /* await deleteImage(cardImage.dataset.filename); */  
           // eslint-disable-next-line no-shadow
           await getPosts((data) => {
             templateCard(data);
@@ -225,10 +231,9 @@ export default () => {
         });
       });
       
-      btnsEdit = document.querySelectorAll('.btn-edit');
+      const btnsEdit = document.querySelectorAll('.btn-edit');
       btnsEdit.forEach((btn) => {
         btn.addEventListener('click', async (e) => {
-          
           const cardFather = e.target.closest('.card');
           const idCard = cardFather.dataset.id;
           const input = cardFather.querySelector('#input-user-description');
@@ -272,8 +277,9 @@ export default () => {
       cardsContainer.innerHTML = ' <img src="/img/icons8_empty_box_5.svg"><p> No hay publicaciones pendientes </p> ';
     }
   };
-
+  
   let uid = '';
+
   /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
   const photoAside = divElement.querySelector('.aside-title img');
   /* const photoimgCard = cardsContainer.querySelector('.card-title img'); */
@@ -290,17 +296,13 @@ export default () => {
         /* photoimgCard.src = 'img/ejemplo.jpg' */
       }
       uid = user.uid;
-      /* const displayName = user.displayName;
-      const email = user.email;
-      const emailVerified = user.emailVerified;
-      const photoURL = user.photoURL;
-      const uid = user.uid; */
 
       getPosts((data) => {
         /* data.forEach(async(post) => {
           await fireAddSubcollection( user.uid, user.displayName, user.email, post.id) 
         }) */
         templateCard(data);
+      
       });
     } else {
       console.log('Estas fuera de sesion');

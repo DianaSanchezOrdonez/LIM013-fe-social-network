@@ -60,6 +60,27 @@ const saveComment = (username, comment, refpost) =>
     refpost
   })
 
+/* db.collection("cities").where("capital", "==", true) */
+const getComments = (idPost) =>
+  firebase
+    .firestore()
+    .collection('comments').where('refpost', '==', idPost)
+    .get()
+    .then((snapshot) => {
+      const data = [];
+      snapshot.forEach((doc) => {
+        data.push({
+          username: doc.data().username,
+          comment: doc.data().comment,
+          refpost: doc.data().refpost
+        });
+      });
+      return data;
+    })
+    .catch(error => {
+      console.log('The error is: ', error);
+    });
+
 /*-----------AGREGANDO SUBCOLLECTION----------------------*/
 const fireAddSubcollection = (uid, username, useremail, postId) => {
   const commentsPostRef = firebase
@@ -90,5 +111,6 @@ export {
   signInWithGoogle,
   signInWithFacebook,
   signOut,
-  saveComment
+  saveComment,
+  getComments
 };
