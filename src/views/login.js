@@ -48,6 +48,7 @@ export default () => {
 
     signIn(inputEmail, inputPassword)
       .then((result) => {
+        console.log('resultNormal', result); 
         name = result.user.email.split(regExp)[0];
         localStorage.setItem('name', name);
         /* console.log('name1', name); */
@@ -62,11 +63,9 @@ export default () => {
   const btnGoogle = divElement.querySelector('.btn-redes-g');
   btnGoogle.addEventListener('click', () => {
     // e.preventDefault();
-    const provider = new firebase.auth.GoogleAuthProvider();
-    console.log('provider', provider);
-    signInWithGoogle(provider)
+    signInWithGoogle()
       .then((result) => {
-        /* console.log('result', result); */
+        console.log('resultGoogle', result); 
         name = result.additionalUserInfo.profile.given_name;
         name = name.split(regExp)[0];
         localStorage.setItem('name', name);
@@ -79,12 +78,9 @@ export default () => {
   const btnFacebook = divElement.querySelector('.btn-redes-f');
   btnFacebook.addEventListener('click', (e) => {
     e.preventDefault();
-    const provider = new firebase.auth.FacebookAuthProvider();
-
-    signInWithFacebook(provider)
-      .then((result) => {
-        console.log('result', result);
-        name = result.additionalUserInfo.profile.name(regExp);
+    signInWithFacebook().then((result) => {
+        console.log('resultFacebook', result); 
+        name = result.additionalUserInfo.profile.name;
         name = name.split(regExp)[0];
         localStorage.setItem('name', name);
 

@@ -11,12 +11,14 @@ const fixtureData = {
     posts: {
       __doc__: {
         post_1: {
+          name: 'Giovand',
           description: 'aprendi a cocinar',
-          imagenURL: '',
+          imagenURL: ''
         },
         post_2: {
+          name: 'Diana',
           description: 'aprendi a pintar',
-          imagenURL: '',
+          imageURL: ''
         },
       },
     },
@@ -25,27 +27,108 @@ const fixtureData = {
 
 window.firebase = new MockFirebase(fixtureData);
 
-describe('Guardar Post', () => {
-  it('Debería guardar el Post', done => savePost('Nuevo post post_3', 'ejemplo.png').then(() => getPosts((data) => {
-    const result = data.find(post => post.description === 'Nuevo post post_3');
-    expect(result.description).toBe('Nuevo post post_3');
+/*-------------------Test savePost Version 02-------------------------------*/
+
+describe('Guardar post 3', () => {
+  it('Deberia guardar el post', (done) => {
+    firebase.firestore().collection('posts').get()
+      .then((response) => {
+        expect(response._data.length).toBe(2);
+      })
+      .then(() => {
+        return savePost('Post_3','Nuevo post post_3', 'ejemplo.png')
+      })
+      .then(() => {
+        return firebase.firestore().collection('posts').get();
+      })
+      .then((posts) => {
+        const result = posts._data.find(docPost => docPost['_data'].name === 'Post_3');
+        expect(posts._data.length).toBe(3);
+        expect(result['_data'].name).toBe('Post_3');
+        done();
+      })
+  })
+})
+
+describe('Guardar post 4', () => {
+  it('Deberia guardar el post', (done) => {
+    firebase.firestore().collection('posts').get()
+      .then((response) => {
+        expect(response._data.length).toBe(3);
+      })
+      .then(() => {
+        return savePost('Test','Nuevo post post_4', 'test.png')
+      })
+      .then(() => {
+        return firebase.firestore().collection('posts').get();
+      })
+      .then((posts) => {
+        const result = posts._data.find(docPost => docPost['_data'].name === 'Test');
+        expect(posts._data.length).toBe(4);
+        expect(result['_data'].name).toBe('Test');
+        done();
+      })
+  })
+})
+
+/*-------------------Test updatePost version 01-------------------------------*/
+
+describe('Actualizar post_01', () => {
+  it('Debería actualizar el post _02', (done) => updatePost('post_1', 'Aprendi a tejer').then(() => getPosts((data) => {
+    const result = data.find(post => post.id === 'post_1');
+    expect(result.id).toBe('post_1');
     done();
   })));
 });
 
-describe('Actualizar Post', () => {
-  it('Debería actualizar el Post', done => updatePost('post_2', 'Hello World').then(() => getPosts((data) => {
+describe('Actualizar post_02', () => {
+  it('Debería actualizar el post _02', (done) => updatePost('post_2', 'Hello World').then(() => getPosts((data) => {
     const result = data.find(post => post.id === 'post_2');
     expect(result.id).toBe('post_2');
     done();
   })));
 });
 
-/* describe('Eliminar Post', () => {
-  it('Debería eliminar el Post', done => deletePost({ id: 'post_3' }).then(() => getPosts((data) => {
-    const result = data.find(post => post.id === 'post_3');
-    expect(result.id).toBe(undefined);
-    done();
-  })));
-});
- */
+/*-------------------Test deletePost version 02-------------------------------*/
+
+describe('Eliminar post_1', () => {
+  it('Deberia eliminar el post', (done) => {
+    firebase.firestore().collection('posts').get()
+      .then((response) => {
+        expect(response._data.length).toBe(4);
+      })
+      .then(() => {
+        return deletePost('post_1')
+      })
+      .then(() => {
+        return firebase.firestore().collection('posts').get();
+      })
+      .then((posts) => {
+        const result = posts._data.find(docPost => docPost['_data'].name === 'Giovand');
+        expect(posts._data.length).toBe(3);
+        expect(result).toBe(undefined);
+        done();
+      })
+  })
+})
+
+describe('Eliminar post_02', () => {
+  it('Deberia eliminar el post', (done) => {
+    firebase.firestore().collection('posts').get()
+      .then((response) => {
+        expect(response._data.length).toBe(3);
+      })
+      .then(() => {
+        return deletePost('post_2')
+      })
+      .then(() => {
+        return firebase.firestore().collection('posts').get();
+      })
+      .then((posts) => {
+        const result = posts._data.find(docPost => docPost['_data'].name === 'Diana');
+        expect(posts._data.length).toBe(2);
+        expect(result).toBe(undefined);
+        done();
+      })
+  })
+})
