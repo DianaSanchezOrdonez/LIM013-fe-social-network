@@ -61,14 +61,15 @@ const saveComment = (username, comment, refpost) =>
   })
 
 /* db.collection("cities").where("capital", "==", true) */
-const getComments = (idPost) =>
+const getComments = () =>
   firebase
     .firestore()
-    .collection('comments').where('refpost', '==', idPost)
+    .collection('comments')
     .get()
     .then((snapshot) => {
       const data = [];
       snapshot.forEach((doc) => {
+        /* console.log(doc.data()); */
         data.push({
           username: doc.data().username,
           comment: doc.data().comment,
@@ -82,19 +83,37 @@ const getComments = (idPost) =>
     });
 
 /*-----------AGREGANDO SUBCOLLECTION----------------------*/
-const fireAddSubcollection = (uid, username, useremail, postId) => {
+/* function fireAddStudentToClassroom(studentUserId, classroomId) {
+
+  var db = firebase.firestore();
+  var studentsClassroomRef =
+      db.collection('student_class').doc(classroomId)
+        .collection('students');
+
+  studentsClassroomRef
+      .doc(studentUserId)
+      .set({})
+      .then(function () {
+          console.log('Document Added ');
+      })
+      .catch(function (error) {
+          console.error('Error adding document: ', error);
+      });
+} */
+
+const fireAddSubcollection = ( comment, username, uid, postId) => {
   const commentsPostRef = firebase
     .firestore()
-    .collection("comments")
+    .collection("posts")
     .doc(postId)
-    .collection("likes");
+    .collection("comments");
 
     commentsPostRef
-    .doc(uid)
+    .doc()
     .set({
-      uid,
+      comment,
       username,
-      useremail,
+      uid,
     })
     .then(() => console.log("Document Added "))
     .catch((error) => console.error("Error adding document: ", error));

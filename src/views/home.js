@@ -123,11 +123,32 @@ export default () => {
   /* --ELIMINAR LA IMAGEN TAMBIEN DEL STORAGE---*/
   const deleteImage = nameImage => ref.child(nameImage).delete().catch( error => console.log(error));
 
+  /* --TRAER LA DATA DE LOS COMMENTS---*/
+  const templateComments = (data, idPost) => {
+    let template = '';
+    for(let doc of data ){
+      if(idPost === doc.refpost){
+        console.log('idPost', idPost);
+        console.log('doc.refpost', doc.refpost);
+        template += `
+        <div class="comment_section_two">
+          <span>${doc.username}</span><label id="comment-label" for="">${doc.comment}</label>
+        </div>
+        `;
+      }else{
+        console.log('idPost', idPost);
+        console.log('doc.refpost', doc.refpost);
+        template = '';
+      }
+    }
+    return template;
+  }
+
   /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
   const templateCard = (data) => {
     if (data.length) {
       cardsContainer.innerHTML = '';
-      data.forEach((element) => {
+      data.forEach(async(element) => {
         if(!element.imageURL){
           cardsContainer.innerHTML += `
             <section class="card" data-id=${element.id} >
@@ -149,14 +170,15 @@ export default () => {
               <div class="comment_section">
                   <span>${nameLocal}</span><input id="comment-input" type="text">
               </div>
-              
               <section class="comments">
-                
+                ${ templateComments(await getComments(), element.id)}
               </section>
             </section>`;
+          /*   console.log('hola',cardsContainer.querySelectorAll('.comments'));
+            templateComments(await getComments(element.id), cardsContainer.querySelectorAll('.comments'), element.id); */
         }else{
           cardsContainer.innerHTML += `
-          <section class="card" data-id=${element.id} data-uid=${element.uid}>
+          <section class="card" data-id=${element.id}>
             <section class="card-title"><img src="img/ejemplo.jpg" alt="">${element.name}</section>
             <section class="card-image"><img src="${element.imageURL}" alt="" data-filename=${name}></section>
             <section class="card-description"><input type="text" id="input-user-description" placeholder='${element.description}' disabled></section>
@@ -177,19 +199,20 @@ export default () => {
                 <span>${nameLocal}</span><input id="comment-input" type="text">
             </div>
             <section class="comments">
-              
             </section>
           </section>`;
         }
       });
 
       const commentInputs = cardsContainer.querySelectorAll('#comment-input');
+      // console.log('commentInputs', commentInputs);
       commentInputs.forEach((input) => {
         input.addEventListener('keypress', async(e) => {
+          console.log('e.target.value', e.target.value);
           const cardFather = e.target.closest('.card');
           const comments = cardFather.querySelector('.comments');
           const idCard = cardFather.dataset.id;
-          /* comments.innerHTML = ''; */
+          comments.innerHTML = ''; 
           if(e.keyCode === 13) {
             await saveComment(nameLocal, e.target.value, idCard)
             comments.innerHTML = `
@@ -198,19 +221,6 @@ export default () => {
               </div>
             `
           } 
-
-          /* --TRAER LA DATA DE LOS COMENTARIOS ---*/
-          getComments(idCard).then(data => {
-            comments.innerHTML = '';
-            data.forEach((doc) => {
-              comments.innerHTML = `
-              <div class="comment_section_two">
-                  <span>${doc.username}</span><label id="comment-label" for="">${doc.comment}</label>
-              </div>
-            `
-            })
-
-          })
         })
       })
 
@@ -277,7 +287,7 @@ export default () => {
       cardsContainer.innerHTML = ' <img src="/img/icons8_empty_box_5.svg"><p> No hay publicaciones pendientes </p> ';
     }
   };
-  
+
   let uid = '';
 
   /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
