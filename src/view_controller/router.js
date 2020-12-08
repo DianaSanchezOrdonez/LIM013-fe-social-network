@@ -1,4 +1,5 @@
 /* eslint-disable no-lone-blocks */
+// eslint-disable-next-line import/named
 import { components } from '../views/components.js';
 
 // eslint-disable-next-line consistent-return
@@ -7,16 +8,14 @@ const changeView = (route) => {
   container.innerHTML = '';
   switch (route) {
     case '#/': { return container.appendChild(components.login()); }
-    // case '': { return container.appendChild(components.login()); }
     case '#': { return container.appendChild(components.login()); }
+    case '': { return container.appendChild(components.login()); }
     case '#/home': { return container.appendChild(components.home()); }
     case '#/register': { return container.appendChild(components.register()); }
     case '#/profile': { return container.appendChild(components.profile()); }
     default:
-      { container.appendChild(components.login()); }
-      break;
+      return container.appendChild(components.notfound());
   }
-  // eslint-disable-next-line no-console
   /* console.log(route); */
 };
 

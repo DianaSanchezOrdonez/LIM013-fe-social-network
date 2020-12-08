@@ -34,5 +34,7 @@
     "stylelint": "^10.1.0",
     "stylelint-config-recommended": "^2.2.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "mock-cloud-firestore": "^0.12.0"
+  }
 }
