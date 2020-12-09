@@ -221,8 +221,15 @@ body {
   padding: 10px;
   color: var(--color-black);
   display: flex;
-  align-items: center;
+  justify-content: space-between;
   font-weight: 500;
+}
+.title-img {
+  display: flex;
+}
+.card-title span {
+  color: var(--color-footer);
+  align-self: center;
 }
 #input-user-name{
   font-weight: 600;
