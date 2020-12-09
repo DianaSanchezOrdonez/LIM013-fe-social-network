@@ -1,7 +1,11 @@
+/* eslint-disable no-use-before-define */
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 /* eslint-disable no-console */
-import { getUserInfo } from '../controllers/firestore.js';
+import {
+  getDataForm,
+  saveData,
+} from '../controllers/perfil_controller.js';
 
 export default () => {
   const viewProfile = `
@@ -26,17 +30,28 @@ export default () => {
     </header>
     <main class="main-container">
     <aside class="main-container_aside_profile">
-        <section class="card">
+        <section class="card" >
             <img src=" " alt="">
-            <div class="card-profileinfo" id = "modal1">
-                <h3></h3>
-                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Blanditiis, fuga.</p>
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam delectus soluta voluptatum officiis reiciendis, corporis cupiditate sequi magnam obcaecati molestias.</p>
+            <div class="card-profileinfo">
+            <div class = "infoProfile">
+            <p>...</p>
+            <p>...</p>
+            <p>...</p>
             </div>
-            <button class="btn-editar-profile">Editar Perfil</button>
+            <button class="btn-editar-profile" id = "editProfile">Editar Perfil</button>
+             <form id="card-container" class="ocultar">
+              <p>Nombre</p>
+              <input class="name" type="text" id="name"  placeholder="Ingresa tu nombre" required>
+              <p>Apellidos</p>
+              <input class="lastName" type="name" id="lastName"  placeholder="Ingresar Apellidos" required>
+              <p>Descripcion</p>
+              <input class="description" type="text" id="description"  placeholder="Breve descripcion" required>
+              <button  type="submit" class="btn-editar-profile" id="saveProfile">Guardar Cambios</button>
+              </form>
+            </div>
+            
         </section>
     </aside>
-
     <section class="main-container_section_profile">
         <section class="card">
             <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam delectus soluta voluptatum officiis reiciendis, corporis cupiditate sequi magnam obcaecati molestias.</p>
@@ -53,7 +68,7 @@ export default () => {
   const divElement = document.createElement('section');
   divElement.classList.add('container');
   divElement.innerHTML = viewProfile;
-  getUserInfo().then(data => console.log(data));
+  // getUserInfo().then(data => console.log(data));
   const nameLocal = localStorage.getItem('name');
   /* --DESPLEGAR EL MENU---*/
   const toggleMenu = divElement.querySelector('.menu');
@@ -76,18 +91,28 @@ export default () => {
   /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
   const photoProfile = divElement.querySelector('.main-container_aside_profile .card ');
   const cardProfileinfo = divElement.querySelector('.card-profileinfo');
-  firebase.auth().onAuthStateChanged((user) => {
+  firebase.auth().onAuthStateChanged(async (user) => {
+    await getDataForm(user.uid)
+      .then((data) => {
+        infoProfile.innerHTML = '';
+        infoProfile.innerHTML += `
+      <p>${data.data().name}</p>
+      <p>${data.data().lastName}</p>
+      <p>${data.data().description}</p>
+      
+      `;
+      });
+
     if (user) {
       if (user.photoURL && user.displayName) {
         profileImg.querySelector('img').src = user.photoURL;
         photoProfile.querySelector('img').src = user.photoURL;
-        cardProfileinfo.querySelector('h3').innerText = user.displayName;
+        // cardProfileinfo.querySelector('h3').innerText = user.displayName;
       } else {
         profileImg.querySelector('img').src = 'img/ejemplo.jpg';
         photoProfile.querySelector('img').src = 'img/ejemplo.jpg';
         cardProfileinfo.querySelector('h3').innerText = nameLocal;
       }
-      getUserInfo((data) => {});
     } else {
       console.log('Estas fuera de sesion');
     }
@@ -95,35 +120,38 @@ export default () => {
 
 
   // MOSTRANDO EL MODAL PARA EDITAR PERFIL
-  const open = divElement.querySelector('.btn-editar-profile');
-  open.addEventListener('click', () => {
-    cardProfileinfo.innerHTML = '';
-    cardProfileinfo.innerHTML += `
-      <form id="card-modal">
-          <p>Nombre</p>
-          <input class ="name" type="text" id="name"  placeholder="Ingresa tu nombre" required>
-          <p>Apellidos</p>
-          <input class = "lastName" type="name" id="lastName"  placeholder="Ingresar Apellidos" required>
-          <p>Descripcion</p>
-          <input class = "description" type="text" id="description"  placeholder="Breve descripcion" required>
-          
-        </form>
-    `;
-    open.innerText = 'Guardar Cambios';
-    const db = firebase.firestore();
-    const formElement = divElement.querySelector('#card-modal');
-    const name = formElement.querySelector('#name');
-    const lastName = formElement.querySelector('#lastName');
-    const description = formElement.querySelector('#description');
-    console.log(name);
-    const close = divElement.querySelector('#close');
-    open.addEventListener('click', () => {
-      db.collection('modalEdit').doc().set({
-        name: name.value,
-        lastName: lastName.value,
-        description: description.value,
+
+  const card = divElement.querySelector('#card-container');
+  const button = divElement.querySelector('#editProfile');
+  const infoProfile = divElement.querySelector('.infoProfile');
+  button.addEventListener('click', (e) => {
+    card.style.display = 'block';
+    infoProfile.style.display = 'none';
+    button.style.display = 'none';
+  });
+
+  card.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const name = divElement.querySelector('#name');
+    const lastName = divElement.querySelector('#lastName');
+    const description = divElement.querySelector('#description');
+    saveData(name.value, lastName.value, description.value);
+    console.log(name.value, lastName.value, description.value);
+    card.style.display = 'none';
+    infoProfile.style.display = 'block';
+    const idUser = firebase.auth().currentUser.uid;
+    getDataForm(idUser)
+      .then((data) => {
+        console.log(data);
+        infoProfile.innerHTML = '';
+        infoProfile.innerHTML += `
+      <p>${data.data().name}</p>
+      <p>${data.data().lastName}</p>
+      <p>${data.data().description}</p>
+      `;
       });
-    });
+    // name.focus();
   });
 
   return divElement;

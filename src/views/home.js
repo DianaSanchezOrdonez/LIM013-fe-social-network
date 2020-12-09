@@ -1,15 +1,15 @@
 /* eslint-disable no-console */
 /* eslint-disable no-undef */
 import {
+  signOut,
+} from '../controllers/login_controller.js';
+import {
   savePost,
   getPosts,
   deletePost,
   updatePost,
-  // eslint-disable-next-line no-unused-vars
-  fireAddSubcollection,
-  signOut,
   saveComment,
-} from '../controllers/firestore.js';
+} from '../controllers/home_controller.js';
 
 export default () => {
   const viewInicio = `

@@ -4,7 +4,7 @@ import {
   signIn,
   signInWithGoogle,
   signInWithFacebook,
-} from '../controllers/firestore.js';
+} from '../controllers/login_controller.js';
 
 export default () => {
   const viewLogin = `
