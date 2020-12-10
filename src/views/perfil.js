@@ -1,3 +1,4 @@
+/* eslint-disable import/named */
 /* eslint-disable no-use-before-define */
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
@@ -111,7 +112,7 @@ export default () => {
       } else {
         profileImg.querySelector('img').src = 'img/ejemplo.jpg';
         photoProfile.querySelector('img').src = 'img/ejemplo.jpg';
-        cardProfileinfo.querySelector('h3').innerText = nameLocal;
+        // cardProfileinfo.querySelector('h3').innerText = nameLocal;
       }
     } else {
       console.log('Estas fuera de sesion');

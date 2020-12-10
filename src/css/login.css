@@ -313,6 +313,9 @@ body {
   background-color: rgba(240, 160, 0, 0.8);
 }
 /*------------PROFILE------------------------*/
+.ocultar{
+  display:none;
+}
 .comments {
   display: flex;
   flex-direction: column;
