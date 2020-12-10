@@ -107,11 +107,11 @@ export default () => {
       if (user.photoURL && user.displayName) {
         profileImg.querySelector('img').src = user.photoURL;
         photoProfile.querySelector('img').src = user.photoURL;
-        // cardProfileinfo.querySelector('h3').innerText = user.displayName;
+        cardProfileinfo.querySelector('h3').innerText = user.displayName;
       } else {
         profileImg.querySelector('img').src = 'img/ejemplo.jpg';
         photoProfile.querySelector('img').src = 'img/ejemplo.jpg';
-        cardProfileinfo.querySelector('h3').innerText = nameLocal;
+        // cardProfileinfo.querySelector('h3').innerText = nameLocal;
       }
     } else {
       console.log('Estas fuera de sesion');
