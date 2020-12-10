@@ -1,9 +1,10 @@
+/* eslint-disable no-console */
 // import { auth, fstore } from '../controllers/initialFirebase.js';
 import {
   signIn,
   signInWithGoogle,
   signInWithFacebook,
-} from '../controllers/firestore.js';
+} from '../controllers/login_controller.js';
 
 export default () => {
   const viewLogin = `
@@ -11,10 +12,7 @@ export default () => {
     <main class="right-side">
       <form class="form-login">
         <h2 class="text-center"> Aislados </h2>
-        <section class="redes">
-          <button class="btn-redes-g"><i class="fab fa-google"></i></button>
-          <button class="btn-redes-f"><i class="fab fa-facebook-f"></i></button>
-        </section>
+        
         <p class="text-sign-in">También puedes ingresar con tu cuenta personal</p>
         <p class="message-error"></p>
         <div class="input-container">
@@ -27,6 +25,10 @@ export default () => {
         </div>
         <button class="btn-login" id="btn-login" value="Iniciar Sesion" type ="submit">Iniciar Sesión</button>
         <p class="text-sign-in">¿Aún no tienes cuenta? <a href="#/register">Registrarse</a></p> 
+        <section class="redes">
+          <button class="btn-redes-g"><i class="fab fa-google"></i></button>
+          <button class="btn-redes-f"><i class="fab fa-facebook-f"></i></button>
+        </section>
       </form>
     </main>
   `;
@@ -48,6 +50,7 @@ export default () => {
 
     signIn(inputEmail, inputPassword)
       .then((result) => {
+        console.log('resultNormal', result);
         name = result.user.email.split(regExp)[0];
         localStorage.setItem('name', name);
         /* console.log('name1', name); */
@@ -62,11 +65,9 @@ export default () => {
   const btnGoogle = divElement.querySelector('.btn-redes-g');
   btnGoogle.addEventListener('click', () => {
     // e.preventDefault();
-    const provider = new firebase.auth.GoogleAuthProvider();
-    console.log('provider', provider);
-    signInWithGoogle(provider)
+    signInWithGoogle()
       .then((result) => {
-        /* console.log('result', result); */
+        console.log('resultGoogle', result);
         name = result.additionalUserInfo.profile.given_name;
         name = name.split(regExp)[0];
         localStorage.setItem('name', name);
@@ -79,12 +80,10 @@ export default () => {
   const btnFacebook = divElement.querySelector('.btn-redes-f');
   btnFacebook.addEventListener('click', (e) => {
     e.preventDefault();
-    const provider = new firebase.auth.FacebookAuthProvider();
-
-    signInWithFacebook(provider)
+    signInWithFacebook()
       .then((result) => {
-        console.log('result', result);
-        name = result.additionalUserInfo.profile.name(regExp);
+        console.log('resultFacebook', result);
+        name = result.additionalUserInfo.profile.name;
         name = name.split(regExp)[0];
         localStorage.setItem('name', name);
 

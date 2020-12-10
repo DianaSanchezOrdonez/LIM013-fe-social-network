@@ -1,4 +1,5 @@
-import { signUp } from '../controllers/firestore.js';
+/* eslint-disable no-console */
+import { signUp } from '../controllers/login_controller.js';
 
 export default () => {
   const viewRegister = `
