@@ -131,6 +131,7 @@ export default () => {
 
   /* --TRAER LA DATA DE LOS COMMENTS---*/
   const templateComments = (data) => {
+    /* console.log('dataTemplate', data); */
     let template = "";
     data.forEach((doc) => {
       template += `
@@ -139,15 +140,19 @@ export default () => {
       </div>
       `;
     });
+    /* console.log('template',template); */
     return template;
   };
   
   /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
   const templateCard = (data) => {
+    console.log('data2', data);
     if (data.length) {
       cardsContainer.innerHTML = "";
-      data.forEach(async (element) => {
+      data.forEach(async(element) => {
+        console.log(element);
         if (!element.imageURL) {
+          
           cardsContainer.innerHTML += `
             <section class="card" data-id=${element.id} >
               <section class="card-title">
@@ -157,7 +162,7 @@ export default () => {
                 </div>
                 <span>${ element.datetime }</span>
               </section>
-              <section class="card-description"><input type="text" id="input-user-description" placeholder='${
+              <section class="card-description"><input type="text" class="input-user-description" placeholder='${
                 element.description
               }' disabled></section>
               <section class="card-options">
@@ -178,16 +183,19 @@ export default () => {
                   }
               </section>
               <div class="comment_section">
-                  <span>${nameLocal}</span><input id="comment-input" type="text">
+                  <span>${nameLocal}</span><input class="comment-input" type="text">
               </div>
               <section class="comments">
-              
+                ${ templateComments( await getSubcollectionComments(element.id))}  
               </section>
+          
             </section>`;
-          /*  ${ templateComments( await getSubcolletionComments(element.id))}  
+            console.log(cardsContainer);
+          /*  ${ templateComments( await getSubcollectionComments(element.id))}  
             console.log('hola',cardsContainer.querySelectorAll('.comments'));
             templateComments(await getComments(element.id), cardsContainer.querySelectorAll('.comments'), element.id); */
         } else {
+          console.log('imagen',element.imageURL);
           cardsContainer.innerHTML += `
           <section class="card" data-id=${element.id}>
             <section class="card-title">
@@ -200,7 +208,7 @@ export default () => {
             <section class="card-image"><img src="${
               element.imageURL
             }" alt="" data-filename=${name}></section>
-            <section class="card-description"><input type="text" id="input-user-description" placeholder='${
+            <section class="card-description"><input type="text" class="input-user-description" placeholder='${
               element.description
             }' disabled></section>
             <section class="card-options">
@@ -221,15 +229,16 @@ export default () => {
                 }
             </section>
             <div class="comment_section">
-                <span>${nameLocal}</span><input id="comment-input" type="text">
+                <span>${nameLocal}</span><input class="comment-input" type="text">
             </div>
             <section class="comments">
+          
             </section>
           </section>`;
         }
       });
       
-      const commentInputs = cardsContainer.querySelectorAll("#comment-input");
+      const commentInputs = cardsContainer.querySelectorAll(".comment-input");
       // console.log('commentInputs', commentInputs);
       commentInputs.forEach((input) => {
         input.addEventListener("keypress", async (e) => {
@@ -271,7 +280,8 @@ export default () => {
           await deletePost(idCard);
           /* await deleteImage(cardImage.dataset.filename); */
           // eslint-disable-next-line no-shadow
-          await getPosts((data) => {
+          getPosts((data) => {
+            
             templateCard(data);
           });
         });
@@ -282,7 +292,7 @@ export default () => {
         btn.addEventListener("click", async (e) => {
           const cardFather = e.target.closest(".card");
           const idCard = cardFather.dataset.id;
-          const input = cardFather.querySelector("#input-user-description");
+          const input = cardFather.querySelector(".input-user-description");
           const btnUpdate = cardFather.querySelector(".btn-update");
           input.disabled = false;
           // eslint-disable-next-line no-param-reassign
@@ -301,7 +311,7 @@ export default () => {
           btn.style.display = "block";
 
           const cardFather = e.target.closest(".card");
-          const input = cardFather.querySelector("#input-user-description");
+          const input = cardFather.querySelector(".input-user-description");
 
           await updatePost(id, {
             description: input.value,
@@ -350,8 +360,9 @@ export default () => {
       /* data.forEach(async(post) => {
         await fireAddSubcollection( user.uid, user.displayName, user.email, post.id) 
       }) */
+      console.log('data', data);
       templateCard(data);
-      data.forEach(async(post) => {
+      /* data.forEach(async(post) => {
         await getSubcollectionComments(post.id).then(data => data.forEach(doc => {
           cardsContainer.querySelector('.comments').innerHTML += `
             <div class="comment_section_two">
@@ -359,7 +370,7 @@ export default () => {
             </div>
           `
         }))
-      })
+      }) */
      
     });
     /* getSubcollectionComments('RLVY8GWjcG0E0dLh39pp').then(data => console.log(data)) */
