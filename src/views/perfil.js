@@ -138,13 +138,13 @@ export default () => {
     const lastName = divElement.querySelector('#lastName');
     const description = divElement.querySelector('#description');
     saveData(name.value, lastName.value, description.value);
-    console.log(name.value, lastName.value, description.value);
+    // console.log(name.value, lastName.value, description.value);
     card.style.display = 'none';
     infoProfile.style.display = 'block';
     const idUser = firebase.auth().currentUser.uid;
     getDataForm(idUser)
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         infoProfile.innerHTML = '';
         infoProfile.innerHTML += `
       <p>${data.data().name}</p>
