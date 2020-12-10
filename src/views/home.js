@@ -237,13 +237,13 @@ export default () => {
           const comments = cardFather.querySelector(".comments");
           const idCard = cardFather.dataset.id;
           comments.innerHTML = "";
-          getSubcollectionComments(idCard).then(data => data.forEach(doc => {
+          /* getSubcollectionComments(idCard).then(data => data.forEach(doc => {
             comments.innerHTML = `
               <div class="comment_section_two">
                   <span>${doc.username}</span><label id="comment-label" for="">${doc.comment}</label>
               </div>
             `
-          }))
+          })) */
           if (e.keyCode === 13) {
             await addSubcollectionComments(
               e.target.value,
@@ -321,7 +321,7 @@ export default () => {
         btn.addEventListener("click", async(e) => {
           const cardFather = e.target.closest(".card");
           const idCard = cardFather.dataset.id;
-          console.log(e.target);
+          /* console.log(e.target); */
           getSubcollectionLikes(idCard, firebase.auth().currentUser.uid).then(data => {
             data.forEach( async(doc) => {
               if(doc.id === firebase.auth().currentUser.uid){
@@ -345,7 +345,25 @@ export default () => {
   /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
   const photoAside = divElement.querySelector(".aside-title img");
   /* const photoimgCard = cardsContainer.querySelector('.card-title img'); */
-  firebase.auth().onAuthStateChanged((user) => {
+  firebase.auth().onAuthStateChanged(async(user) => {
+    getPosts((data) => {
+      /* data.forEach(async(post) => {
+        await fireAddSubcollection( user.uid, user.displayName, user.email, post.id) 
+      }) */
+      templateCard(data);
+      data.forEach(async(post) => {
+        await getSubcollectionComments(post.id).then(data => data.forEach(doc => {
+          cardsContainer.querySelector('.comments').innerHTML += `
+            <div class="comment_section_two">
+                <span>${doc.username}</span><label id="comment-label" for="">${doc.comment}</label>
+            </div>
+          `
+        }))
+      })
+     
+    });
+    /* getSubcollectionComments('RLVY8GWjcG0E0dLh39pp').then(data => console.log(data)) */
+    
     if (user) {
       /* console.log('user', user);  */
       if (user.photoURL) {
@@ -359,12 +377,6 @@ export default () => {
       }
       uid = user.uid;
 
-      getPosts((data) => {
-        /* data.forEach(async(post) => {
-          await fireAddSubcollection( user.uid, user.displayName, user.email, post.id) 
-        }) */
-        templateCard(data);
-      });
     } else {
       console.log("Estas fuera de sesion");
     }

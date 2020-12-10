@@ -99,7 +99,7 @@ const addSubcollectionComments = ( comment, username, uid, postId) => {
 /* let transactionSnapshot = db.collection("shops").doc(shopDoc[i].id).collection("transactions").get().then((doc) => {
   let transactionDoc = transactionSnapshot.docs.map(document => document.data());
   console.log(transactionDoc); */
-
+ 
 const getSubcollectionComments = (idPost) => firebase
   .firestore()
     .collection("posts")
@@ -107,15 +107,12 @@ const getSubcollectionComments = (idPost) => firebase
     .collection("comments")
     .get()
     .then(snapshot => {
-      const data = [];
-      snapshot.forEach(doc => {
-        data.push({
+      const data = snapshot.docs.map((doc) => ({
           id: doc.id,
           comment: doc.data().comment,
           username: doc.data().username,
           uid: doc.data().uid
-        })
-      });
+      }));
       return data;
     })
     .catch(error => {
