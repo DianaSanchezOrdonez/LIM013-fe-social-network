@@ -35,11 +35,22 @@ export default () => {
     <main class="main-container">
         <section class="main-container_section">
             <form class="upload-post">
-                <img id='image'>
-                <textarea name="" id="post-description" rows="3" class="input-post" placeholder="¿Alguna reflexión?" required></textarea>
+                
+                <figure class="container-image-upload">
+                  <img id="image">
+                  <button class="close-button">&times;</button>
+                </figure>
+            
+                <textarea name="" id="post-description" rows="2" class="input-post" placeholder="¿Alguna reflexión?" required></textarea>
                 <div class="upload-options">  
                   <button id='btn-save'><i class="fas fa-save"></i>&nbsp;Guardar</button>
-                  <input class="image-upload-input" type="file" id="post-image">  
+                
+                  <label for="upload" id="upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span id="text">Elegir imagen</span>
+                  </label>
+                  <input type="file" name="upload" id="upload-image">
+              
                 </div>
             </form>
             <section class="card-container">
@@ -65,6 +76,7 @@ export default () => {
     </main>
     <footer class="main-footer">&copy; Por Giovand & Diana</footer>
     `;
+  /** <input class="image-upload-input" type="file" id="post-image"> */
   const divElement = document.createElement("section");
   divElement.classList.add("container");
   divElement.innerHTML = viewInicio;
@@ -98,29 +110,80 @@ export default () => {
   asideSpan.innerText = nameLocal;
 
   /* --SUBIR IMAGEN CON STORAGE---*/
-  let file = postForm.querySelector(".image-upload-input");
+  let inputFile = divElement.querySelector("#upload-image");
   const image = divElement.querySelector("#image");
+
   const ref = firebase.storage().ref();
   let name = "";
 
-  file.addEventListener("change", () => {
-    file = file.files[0];
+  const text = divElement.querySelector('#text')
+  const btn = divElement.querySelector('#upload-btn')
+  const allowedExtensions = /(.jpg|.jpeg|.png|.gif)$/i;
 
-    name = file.name;
+  /* inputFile.addEventListener('change', () => {
+      const path = input.value.split('\\')
+      console.log('path', path);
+      const filename = path[path.length -1]
+      console.log('filename', allowedExtensions.exec(filename));
 
-    const metadata = {
-      contentType: file.type,
-    };
+      text.innerText = filename ? filename : "Elegir imagen"
 
-    const task = ref.child(name).put(file, metadata);
-    task
-      .then((snapshot) => snapshot.ref.getDownloadURL())
-      .then((url) => {
-        /* console.log(url); */
-        image.src = url;
-        imageURL = url;
-      });
+      if(filename)
+          btn.classList.add('chosen')
+      else
+          btn.classList.remove('chosen')
+  }) */
+  inputFile.addEventListener("change", () => {
+    /* console.log(inputFile); */
+    inputFile = inputFile.files[0];
+    console.log('inputNameNuevo', inputFile);
+    /* const path = input.value.split('\\')
+    console.log('path', path);
+    const filename = path[path.length -1] */
+
+    name = inputFile.name;
+  
+    /* text.innerText = name ? name : "Elegir imagen" */
+
+    if(!allowedExtensions.exec(name)){
+      alert('Please upload file having extensions .jpeg/.jpg/.png/.gif only.');
+      inputFile.value = '';
+      text.innerText = "Elegir imagen";
+     /*  btn.classList.remove('chosen'); */
+      return false;
+    }else{
+      const metadata = {
+        contentType: inputFile.type,
+      };
+
+      const task = ref.child(name).put(inputFile, metadata);
+      task
+        .then((snapshot) => snapshot.ref.getDownloadURL())
+        .then((url) => {
+          console.log(url); 
+          image.src = url;
+          imageURL = url;
+        }); 
+      
+      divElement.querySelector('.close-button').classList.add('active')
+      /* btn.classList.add('chosen') */
+    }
+    text.innerText = name ? name : "Elegir imagen";
+    
+    /* if(name)
+      btn.classList.add('chosen')
+    else
+      btn.classList.remove('chosen') */
+      
   });
+
+  divElement.querySelector('.close-button').addEventListener('click', () => {
+    image.src = '';
+   /*  inputFile.value = ''; */
+    console.log('inputFile.value',inputFile.value);
+    divElement.querySelector('.close-button').classList.remove('active')
+    text.innerText = 'Elegir imagen'
+  })
   /* --ELIMINAR LA IMAGEN TAMBIEN DEL STORAGE---*/
   const deleteImage = (nameImage) =>
     ref
@@ -145,7 +208,7 @@ export default () => {
 
   /* --TRAER LA DATA DE LOS POST Y EL TEMPLATE DE LOS CARD---*/
   const templateCard = (data) => {
-    console.log("data", data);
+    /* console.log("data", data); */
     if (data.length) {
       cardsContainer.innerHTML = "";
       data.forEach(async (element) => {
@@ -357,25 +420,16 @@ export default () => {
 
       const likesCard = document.querySelectorAll(".like i");
       likesCard.forEach((btn) => {
-        btn.addEventListener("click", async (e) => {
+        btn.addEventListener("click", async(e) => {
           const cardFather = e.target.closest(".card");
           const idCard = cardFather.dataset.id;
-          /* console.log(e.target); */
-          getSubcollectionLikes(idCard, firebase.auth().currentUser.uid).then(
-            (data) => {
-              data.forEach(async (doc) => {
-                if (doc.id === firebase.auth().currentUser.uid) {
-                  await deleteLike(idCard, doc.id);
-                } else {
-                  await addSubcollectionLikes(
-                    idCard,
-                    firebase.auth().currentUser.uid
-                  );
-                }
-              });
-              cardFather.querySelector(".like span").innerHTML = data.length;
-            }
-          );
+          console.log(e.target);
+
+         await addSubcollectionLikes(idCard, firebase.auth().currentUser.uid);
+          getSubcollectionLikes(idCard).then(data => {
+            btn.style.color = '#f0a000';
+            cardFather.querySelector('.like span').innerText = data.length
+          })
         });
       });
     } else {
@@ -423,6 +477,16 @@ export default () => {
                   card.querySelector(".comment span").innerText = 0;
                 }
               });
+              getSubcollectionLikes(doc.id).then(data => {
+                if(data.length){
+                  card.querySelector('.like i').style.color = '#f0a000';
+                  card.querySelector('.like span').innerText = data.length
+                }else{
+                  card.querySelector('.like i').style.color = '#a5aaa3';
+                  card.querySelector('.like span').innerText = 0;
+                }
+                
+              })
             } else {
               card.querySelector(".comment span").innerText = 0;
               card.querySelector(".comments").innerHTML = "";
@@ -461,6 +525,9 @@ export default () => {
                 card.querySelector(".comment span").innerText = 0;
               }
             });
+            getSubcollectionLikes(doc.id).then(data => {
+              card.querySelector('.like span').innerText = data.length
+            })
           } else {
             card.querySelector(".comment span").innerText = 0;
             card.querySelector(".comments").innerHTML = "";

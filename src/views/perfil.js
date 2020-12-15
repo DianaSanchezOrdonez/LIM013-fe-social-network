@@ -19,10 +19,10 @@ import {
                     <div class="menu">
                         <p>Bienvenidx<br><span></span></p>
                         <ul>
-                            <li><i class="fas fa-home"></i><a href="#/home">Inicio</a></li>
-                            <li><i class="fas fa-users"></i><a href="#/contactos">Contactos</a></li>
-                            <li><i class="fas fa-grin-alt"></i><a href="#/profile">Perfil</a></li>
-                            <li><i class="fas fa-sign-out-alt"></i><a href="#/" id="sign-out-btn">Cerrar Sesión</a></li>
+                          <li><i class="fas fa-home"></i><a href="#/home">Inicio</a></li>
+                          <li><i class="fas fa-users"></i><a href="#/contactos">Contactos</a></li>
+                          <li><i class="fas fa-grin-alt"></i><a href="#/profile">Perfil</a></li>
+                          <li><i class="fas fa-sign-out-alt"></i><a href="#/" id="sign-out-btn">Cerrar Sesión</a></li>
                         </ul>
                     </div>
                 </section>
@@ -33,18 +33,16 @@ import {
           <section class="card" >
               <img src=" " alt="">
               <div class="card-profileinfo">
-              <div class = "infoProfile">
-              <p>...</p>
-              <p>...</p>
-              <p>...</p>
+              <div class = "info-profile">
+            
               </div>
-              <button class="btn-editar-profile" id = "editProfile">Editar Perfil</button>
-               <form id="card-container" class="ocultar">
-                <p>Nombre</p>
+               <button class="btn-editar-profile" id = "edit-profile">Editar Perfil</button>
+               <form id="form-profile" class="ocultar">
+                <label>Nombre:</label>
                 <input class="name" type="text" id="name"  placeholder="Ingresa tu nombre" required>
-                <p>Apellidos</p>
-                <input class="lastName" type="name" id="lastName"  placeholder="Ingresar Apellidos" required>
-                <p>Descripcion</p>
+                <label>Apellidos:</label>
+                <input class="last-name" type="name" id="last-name"  placeholder="Ingresar Apellidos" required>
+                <label>Descripción:</label>
                 <input class="description" type="text" id="description"  placeholder="Breve descripcion" required>
                 <button  type="submit" class="btn-editar-profile" id="saveProfile">Guardar Cambios</button>
                 </form>
@@ -53,14 +51,30 @@ import {
           </section>
       </aside>
       <section class="main-container_section_profile">
+          <p>Puedes compartir tus hobbies, reflexiones que has adquirido en esta cuarentena...</p>
+          <form class="upload-post2">
+                
+                <figure class="container-image-upload">
+                  <img id="image">
+                  <button class="close-button">&times;</button>
+                </figure>
+            
+                <textarea name="" id="post-description" rows="2" class="input-post" placeholder="¿Alguna reflexión?" required></textarea>
+                <div class="upload-options">  
+                  <button id='btn-save'><i class="fas fa-save"></i>&nbsp;Guardar</button>
+                
+                  <label for="upload" id="upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span id="text">Elegir imagen</span>
+                  </label>
+                  <input type="file" name="upload" id="upload-image">
+              
+                </div>
+            </form>
           <section class="card">
               <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam delectus soluta voluptatum officiis reiciendis, corporis cupiditate sequi magnam obcaecati molestias.</p>
               <img class="img-card-profile" src="img/ejemplo.jpg" alt="">
-          </section>   
-          <section class="card">
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam delectus soluta voluptatum officiis reiciendis, corporis cupiditate sequi magnam obcaecati molestias.</p>
-              <img class="img-card-profile" src="img/ejemplo.jpg" alt="">
-          </section>            
+          </section>              
       </section>
       </main>
       <footer class="main-footer">&copy; Por Giovand & Diana</footer>`;
@@ -87,6 +101,8 @@ import {
     /* --PINTAR EL NOMBRE DEL USUARIO ---*/
     const nameSpan = divElement.querySelector('.menu p span');
     nameSpan.innerText = nameLocal;
+
+    const button = divElement.querySelector('#edit-profile');
   
     /* --USAR EL OBSERVADOR DE CAMBIO DE ESTADO---*/
     const photoProfile = divElement.querySelector('.main-container_aside_profile .card ');
@@ -94,13 +110,19 @@ import {
     firebase.auth().onAuthStateChanged(async (user) => {
       await getDataForm(user.uid)
         .then((data) => {
-          infoProfile.innerHTML = '';
-          infoProfile.innerHTML += `
-        <p>${data.data().name}</p>
-        <p>${data.data().lastName}</p>
-        <p>${data.data().description}</p>
-        
-        `;
+          if(!data.data() || data.data() === undefined){
+            infoProfile.innerHTML = `<span>Falta actualizar la información</span>`;
+            button.style.display = 'none';
+          }else{
+            card.style.display = 'none';
+            infoProfile.innerHTML = '';
+            infoProfile.innerHTML += `
+            <p>${data.data().name}</p>
+            <p>${data.data().lastName}</p>
+            <p>${data.data().description}</p>
+            `;
+          
+          }
         });
   
       if (user) {
@@ -111,7 +133,6 @@ import {
         } else {
           profileImg.querySelector('img').src = 'img/ejemplo.jpg';
           photoProfile.querySelector('img').src = 'img/ejemplo.jpg';
-          cardProfileinfo.querySelector('h3').innerText = nameLocal;
         }
       } else {
         console.log('Estas fuera de sesion');
@@ -121,9 +142,9 @@ import {
   
     // MOSTRANDO EL MODAL PARA EDITAR PERFIL
   
-    const card = divElement.querySelector('#card-container');
-    const button = divElement.querySelector('#editProfile');
-    const infoProfile = divElement.querySelector('.infoProfile');
+    const card = divElement.querySelector('#form-profile');
+    
+    const infoProfile = divElement.querySelector('.info-profile');
     button.addEventListener('click', (e) => {
       card.style.display = 'block';
       infoProfile.style.display = 'none';
@@ -134,7 +155,7 @@ import {
       e.preventDefault();
   
       const name = divElement.querySelector('#name');
-      const lastName = divElement.querySelector('#lastName');
+      const lastName = divElement.querySelector('#last-name');
       const description = divElement.querySelector('#description');
       saveData(name.value, lastName.value, description.value);
       console.log(name.value, lastName.value, description.value);
@@ -142,15 +163,22 @@ import {
       infoProfile.style.display = 'block';
       const idUser = firebase.auth().currentUser.uid;
       getDataForm(idUser)
-        .then((data) => {
-          console.log(data);
+      .then((data) => {
+        console.log('dataperfil', data.data());
+        if(!data.data() || data.data() === undefined){
+          infoProfile.innerText = 'Actualizar información';
+          button.style.display = 'none';
+         
+        }else{
+          card.style.display = 'none';
           infoProfile.innerHTML = '';
           infoProfile.innerHTML += `
-        <p>${data.data().name}</p>
-        <p>${data.data().lastName}</p>
-        <p>${data.data().description}</p>
-        `;
-        });
+          <p>${data.data().name}</p>
+          <p>${data.data().lastName}</p>
+          <p>${data.data().description}</p>
+          `;
+        }
+      });
       // name.focus();
     });
   

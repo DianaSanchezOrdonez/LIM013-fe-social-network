@@ -13,6 +13,7 @@
     text-decoration: none;
     list-style: none;
     box-sizing: border-box;
+    outline: none;
   }
   body {
     display: flex;
@@ -153,18 +154,47 @@
     color: var(--color-white);
     flex-direction: column;
   }
+  .main-container_section_profile p {
+    color: var(--color-black);
+  }
   .main-container_section_notfound {
     justify-content: center;
   }
-  .upload-post {
+  .upload-post, .upload-post2 {
     background-color: var(--color-white);
     width: 90%;
     /* height: 150px; */
-    margin: 120px 0px 20px 0;
     padding: 20px;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
+  }
+  .upload-post {
+    margin: 120px 0px 20px 0;
+  }
+  .upload-post2 {
+    margin: 20px 0px;
+  }
+  .container-image-upload {
+    /* padding: 10px 15px; */
+    display: flex;
+    justify-content: center; 
+  }
+  .container-image-upload .close-button {
+    height: 25px;
+    cursor: pointer;
+    border: none;
+    outline: none;
+    color: var(--color-white);
+    background: var(--color-footer);
+    border-radius: 50%;
+    padding: 0px 8px;
+    font-size: 20px;
+    font-weight: bold;
+    transform: translate(-60%, -40%) scale(0);
+  }
+  .container-image-upload .close-button.active {
+    transform: translate(-60%, -40%) scale(1);
   }
   .input-post {
     color: var(--color-bgdark);
@@ -179,9 +209,11 @@
     color: var(--color-bgdark);
   }
   #image{
+    position: relative;
     width: 150px;
     object-fit: contain;
     align-self: center;
+    margin-bottom: 15px;
   }
   .upload-options {
     display: flex;
@@ -189,6 +221,29 @@
     color: var(--color-bgdark);
   /*   height: 20px; */
   }
+  /*--------------------BOTON SUBIR FILE------------------------------------*/
+  input[type="file"] {
+    position: absolute;
+    width: 170px;
+    opacity: 0;
+    height: 30px;
+    cursor: pointer;
+    /* top: -9999px;
+    left: -9999px; */
+  } 
+  #upload-btn {
+    background: var(--color-bgdark);
+  }
+  #upload-image:hover,#upload-btn:not(.chosen):hover{
+    background-color: rgba(52, 124, 98, 0.8);
+  }
+  #btn-save i, #upload-btn i{
+    margin-right: 5px;
+  }
+  #upload-btn.chosen {
+    background: var(--color-green) ;
+  }
+  /*--------------------FIN BOTON SUBIR FILE------------------------------------*/
   .card-container{
     width: 100%;
     display: flex;
@@ -199,13 +254,23 @@
     width: 300px;
   }
   .card-container p, .main-container_section_notfound p {
-    border-radius: 5px;
-    font-weight: 600;
-    text-transform: uppercase;
     background-color: rgba(240, 160, 0, 0.8);
     padding: 10px;
     color: var(--color-black);
+  }
+  .card-container p, .main-container_section_notfound p, .info-profile p{
+    border-radius: 5px;
+    font-weight: 600;
+    text-transform: uppercase;
     margin-bottom: 10px;
+  }
+  .info-profile span {
+    background-color:#d00000;
+    padding: 8px;
+    width: 250px;
+    margin: auto;
+    text-align: center;
+    color: var(--color-white)
   }
   .card {
     display: flex;
@@ -283,29 +348,23 @@
   .btn-options{
     display: flex;
   }
-  .btn-edit, .btn-delete, .btn-update, .btn-editar-profile {
-    width: 80px;
+  .btn-edit, .btn-delete, .btn-update, .btn-editar-profile, #btn-save, #upload-btn {
     margin-right: 5px;
-    padding: 8px;
+    padding: 8px 10px;
     font-family: "Raleway", Arial, Helvetica, sans-serif;
     font-weight: 600;
     border: none;
     border-radius: 5px;
     color: var(--color-white);
     cursor: pointer;
+    font-size: 14px;
+    transition: all ease-out 200ms;
+  }
+  .btn-edit, .btn-delete, .btn-update {
+    width: 80px;
   }
   .btn-update{
     display: none;
-  }
-  #btn-save{
-    margin-right: 5px;
-    padding: 8px;
-    font-family: "Raleway", Arial, Helvetica, sans-serif;
-    font-weight: 600;
-    border: none;
-    border-radius: 5px;
-    color: var(--color-white);
-    cursor: pointer;
   }
   .btn-edit, .btn-update, #btn-save{
     background-color: var(--color-green);
@@ -358,7 +417,7 @@
     font-size: 20px;
   }
   .card-profileinfo p {
-    margin: 15px 0px
+    margin: 15px auto
   }
   .card-profileinfo h3 {
     text-align: center;
@@ -387,6 +446,26 @@
     width: 100%;
     background-color: var(--color-yellow);
     color: var(--color-white)
+  }
+  #form-profile, .info-profile{
+    display: flex;
+    width: 250px;
+    flex-direction: column;
+    margin: auto;
+  }
+  #form-profile label{
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 5px;
+  }
+  #name, #last-name, #description {
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid var(--color-bgdark);
+    margin-bottom: 15px;
+    color: var(--color-black);
+    width: 100%;
+    font-size: 16px;
   }
   /*------------LOGIN------------------------*/
   .container-login {
@@ -492,7 +571,7 @@
     font-size: 16px;
   }
   .message-error{
-      color: tomato;
+      color:#d00000;;
       padding: 10px 0;
       font-style: italic;
       font-size: 16px;

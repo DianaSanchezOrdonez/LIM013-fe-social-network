@@ -12,6 +12,10 @@ import {
       <main class="right-side">
         <form class="form-login">
           <h2 class="text-center"> Aislados </h2>
+          <section class="redes">
+            <button class="btn-redes-g"><i class="fab fa-google"></i></button>
+            <button class="btn-redes-f"><i class="fab fa-facebook-f"></i></button>
+          </section>
           
           <p class="text-sign-in">También puedes ingresar con tu cuenta personal</p>
           <p class="message-error"></p>
@@ -25,10 +29,7 @@ import {
           </div>
           <button class="btn-login" id="btn-login" value="Iniciar Sesion" type ="submit">Iniciar Sesión</button>
           <p class="text-sign-in">¿Aún no tienes cuenta? <a href="#/register">Registrarse</a></p> 
-          <section class="redes">
-            <button class="btn-redes-g"><i class="fab fa-google"></i></button>
-            <button class="btn-redes-f"><i class="fab fa-facebook-f"></i></button>
-          </section>
+        
         </form>
       </main>
     `;
@@ -50,7 +51,7 @@ import {
   
       signIn(inputEmail, inputPassword)
         .then((result) => {
-          console.log('resultNormal', result);
+          /* console.log('resultNormal', result); */
           name = result.user.email.split(regExp)[0];
           localStorage.setItem('name', name);
           /* console.log('name1', name); */
