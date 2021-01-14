@@ -116,42 +116,23 @@ export default () => {
   const ref = firebase.storage().ref();
   let name = "";
 
-  const text = divElement.querySelector('#text')
-  const btn = divElement.querySelector('#upload-btn')
+  const text = divElement.querySelector("#text");
+  const btn = divElement.querySelector("#upload-btn");
   const allowedExtensions = /(.jpg|.jpeg|.png|.gif)$/i;
 
-  /* inputFile.addEventListener('change', () => {
-      const path = input.value.split('\\')
-      console.log('path', path);
-      const filename = path[path.length -1]
-      console.log('filename', allowedExtensions.exec(filename));
-
-      text.innerText = filename ? filename : "Elegir imagen"
-
-      if(filename)
-          btn.classList.add('chosen')
-      else
-          btn.classList.remove('chosen')
-  }) */
   inputFile.addEventListener("change", () => {
     /* console.log(inputFile); */
     inputFile = inputFile.files[0];
-    console.log('inputNameNuevo', inputFile);
-    /* const path = input.value.split('\\')
-    console.log('path', path);
-    const filename = path[path.length -1] */
 
     name = inputFile.name;
-  
-    /* text.innerText = name ? name : "Elegir imagen" */
 
-    if(!allowedExtensions.exec(name)){
-      alert('Please upload file having extensions .jpeg/.jpg/.png/.gif only.');
-      inputFile.value = '';
+    if (!allowedExtensions.exec(name)) {
+      alert("Please upload file having extensions .jpeg/.jpg/.png/.gif only.");
+      inputFile.value = "";
       text.innerText = "Elegir imagen";
-     /*  btn.classList.remove('chosen'); */
+      /*  btn.classList.remove('chosen'); */
       return false;
-    }else{
+    } else {
       const metadata = {
         contentType: inputFile.type,
       };
@@ -160,30 +141,23 @@ export default () => {
       task
         .then((snapshot) => snapshot.ref.getDownloadURL())
         .then((url) => {
-          console.log(url); 
+          console.log(url);
           image.src = url;
           imageURL = url;
-        }); 
-      
-      divElement.querySelector('.close-button').classList.add('active')
-      /* btn.classList.add('chosen') */
+        });
+
+      divElement.querySelector(".close-button").classList.add("active");
     }
     text.innerText = name ? name : "Elegir imagen";
-    
-    /* if(name)
-      btn.classList.add('chosen')
-    else
-      btn.classList.remove('chosen') */
-      
   });
 
-  divElement.querySelector('.close-button').addEventListener('click', () => {
-    image.src = '';
-   /*  inputFile.value = ''; */
-    console.log('inputFile.value',inputFile.value);
-    divElement.querySelector('.close-button').classList.remove('active')
-    text.innerText = 'Elegir imagen'
-  })
+  divElement.querySelector(".close-button").addEventListener("click", () => {
+    image.src = "";
+    /*  inputFile.value = ''; */
+    console.log("inputFile.value", inputFile.value);
+    divElement.querySelector(".close-button").classList.remove("active");
+    text.innerText = "Elegir imagen";
+  });
   /* --ELIMINAR LA IMAGEN TAMBIEN DEL STORAGE---*/
   const deleteImage = (nameImage) =>
     ref
@@ -211,7 +185,7 @@ export default () => {
     /* console.log("data", data); */
     if (data.length) {
       cardsContainer.innerHTML = "";
-      data.forEach(async (element) => {
+      data.forEach((element) => {
         if (!element.imageURL) {
           cardsContainer.innerHTML += `
             <section class="card" data-id=${element.id} >
@@ -249,7 +223,6 @@ export default () => {
               </section>
           
             </section>`;
-
         } else {
           cardsContainer.innerHTML += `
           <section class="card" data-id=${element.id}>
@@ -268,7 +241,7 @@ export default () => {
             <section class="card-options">
                 <section class="options-like-comment">
                   <div class="like">
-                      <i class="fas fa-heart"></i>
+                      <i class="fas fa-heart" ></i>
                       <span>0</span>
                   </div>
                   <div class="comment">
@@ -309,7 +282,9 @@ export default () => {
               idCard
             );
 
-            comments.innerHTML = templateComments( await getSubcollectionComments(idCard));
+            comments.innerHTML = templateComments(
+              await getSubcollectionComments(idCard)
+            );
           }
         });
       });
@@ -413,23 +388,23 @@ export default () => {
               }
             });
           });
-          btn.style.display = 'none';
-          btnEdit.style.display = 'block'
+          btn.style.display = "none";
+          btnEdit.style.display = "block";
         });
       });
 
       const likesCard = document.querySelectorAll(".like i");
       likesCard.forEach((btn) => {
-        btn.addEventListener("click", async(e) => {
+        btn.addEventListener("click", async (e) => {
           const cardFather = e.target.closest(".card");
           const idCard = cardFather.dataset.id;
           console.log(e.target);
 
-         await addSubcollectionLikes(idCard, firebase.auth().currentUser.uid);
-          getSubcollectionLikes(idCard).then(data => {
-            btn.style.color = '#f0a000';
-            cardFather.querySelector('.like span').innerText = data.length
-          })
+          await addSubcollectionLikes(idCard, firebase.auth().currentUser.uid);
+          getSubcollectionLikes(idCard).then((data) => {
+            btn.style.color = "#f0a000";
+            cardFather.querySelector(".like span").innerText = data.length;
+          });
         });
       });
     } else {
@@ -477,16 +452,15 @@ export default () => {
                   card.querySelector(".comment span").innerText = 0;
                 }
               });
-              getSubcollectionLikes(doc.id).then(data => {
-                if(data.length){
-                  card.querySelector('.like i').style.color = '#f0a000';
-                  card.querySelector('.like span').innerText = data.length
-                }else{
-                  card.querySelector('.like i').style.color = '#a5aaa3';
-                  card.querySelector('.like span').innerText = 0;
+              getSubcollectionLikes(doc.id).then((data) => {
+                if (data.length) {
+                  card.querySelector(".like i").style.color = "#f0a000";
+                  card.querySelector(".like span").innerText = data.length;
+                } else {
+                  card.querySelector(".like i").style.color = "#a5aaa3";
+                  card.querySelector(".like span").innerText = 0;
                 }
-                
-              })
+              });
             } else {
               card.querySelector(".comment span").innerText = 0;
               card.querySelector(".comments").innerHTML = "";
@@ -525,9 +499,9 @@ export default () => {
                 card.querySelector(".comment span").innerText = 0;
               }
             });
-            getSubcollectionLikes(doc.id).then(data => {
-              card.querySelector('.like span').innerText = data.length
-            })
+            getSubcollectionLikes(doc.id).then((data) => {
+              card.querySelector(".like span").innerText = data.length;
+            });
           } else {
             card.querySelector(".comment span").innerText = 0;
             card.querySelector(".comments").innerHTML = "";

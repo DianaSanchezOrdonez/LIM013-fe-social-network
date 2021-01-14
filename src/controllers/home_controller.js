@@ -15,7 +15,7 @@ const getPosts = (callback) =>
           description: doc.data().description,
           imageURL: doc.data().imageURL,
           datetime: doc.data().datetime,
-          uid: doc.data().uid
+          uid: doc.data().uid,
         });
       });
       callback(data);
@@ -27,7 +27,7 @@ const savePost = (name, description, imageURL, datetime, uid) =>
     description,
     imageURL,
     datetime,
-    uid
+    uid,
   });
 
 const deletePost = (id) =>
@@ -37,32 +37,14 @@ const updatePost = (id, updatedPost) =>
   firebase.firestore().collection("posts").doc(id).update(updatedPost);
 
 /*-----------AGREGANDO SUBCOLLECTION COMMENTS----------------------*/
-/* function fireAddStudentToClassroom(studentUserId, classroomId) {
-
-  var db = firebase.firestore();
-  var studentsClassroomRef =
-      db.collection('student_class').doc(classroomId)
-        .collection('students');
-
-  studentsClassroomRef
-      .doc(studentUserId)
-      .set({})
-      .then(function () {
-          console.log('Document Added ');
-      })
-      .catch(function (error) {
-          console.error('Error adding document: ', error);
-      });
-} */
-
-const addSubcollectionComments = ( comment, username, uid, datetime, postId) => {
+const addSubcollectionComments = (comment, username, uid, datetime, postId) => {
   const commentsPostRef = firebase
     .firestore()
     .collection("posts")
     .doc(postId)
     .collection("comments");
 
-    commentsPostRef
+  commentsPostRef
     .doc()
     .set({
       comment,
@@ -75,71 +57,70 @@ const addSubcollectionComments = ( comment, username, uid, datetime, postId) => 
 };
 
 /*-----------OBTENIENDO SUBCOLLECTION COMMENTS----------------------*/
-/* let transactionSnapshot = db.collection("shops").doc(shopDoc[i].id).collection("transactions").get().then((doc) => {
-  let transactionDoc = transactionSnapshot.docs.map(document => document.data());
-  console.log(transactionDoc); */
- 
-const getSubcollectionComments = (idPost) => firebase
-  .firestore()
+
+const getSubcollectionComments = (idPost) =>
+  firebase
+    .firestore()
     .collection("posts")
     .doc(idPost)
     .collection("comments")
-    .orderBy('datetime', 'desc')
+    .orderBy("datetime", "desc")
     .get()
-    .then(snapshot => {
+    .then((snapshot) => {
       const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          comment: doc.data().comment,
-          username: doc.data().username,
-          uid: doc.data().uid,
-          datetime: doc.data().datetime,
+        id: doc.id,
+        comment: doc.data().comment,
+        username: doc.data().username,
+        uid: doc.data().uid,
+        datetime: doc.data().datetime,
       }));
       return data;
     })
-    .catch(error => {
-      console.log('The error is: ', error);
+    .catch((error) => {
+      console.log("The error is: ", error);
     });
-    
+
 /*-----------AGREGANDO SUBCOLLECTION LIKES----------------------*/
 const addSubcollectionLikes = (idPost, iduser) => {
   const likesPostRef = firebase
-  .firestore()
-  .collection('posts')
-  .doc(idPost)
-  .collection('likes')
+    .firestore()
+    .collection("posts")
+    .doc(idPost)
+    .collection("likes");
   likesPostRef
-  .doc(iduser)
-  .set({
-    iduser
-  })
-  .then(() => console.log('Like Added'))
-  .catch((error) => console.log('Error adding like:', error))
-}
+    .doc(iduser)
+    .set({
+      iduser,
+    })
+    .then(() => console.log("Like Added"))
+    .catch((error) => console.log("Error adding like:", error));
+};
 
-const getSubcollectionLikes = (idPost) => firebase
-  .firestore()
-  .collection('posts')
-  .doc(idPost)
-  .collection('likes')
-  .get()
-  .then(snapshot => {
-    const data = snapshot.docs.map((doc) => ({
+const getSubcollectionLikes = (idPost) =>
+  firebase
+    .firestore()
+    .collection("posts")
+    .doc(idPost)
+    .collection("likes")
+    .get()
+    .then((snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
         id: doc.id,
-        iduser: doc.data().iduser
-    }));
-    return data;
-  })
+        iduser: doc.data().iduser,
+      }));
+      return data;
+    });
 
-const deleteLike = (idPost, idLike) => firebase
-  .firestore()
-  .collection('posts')
-  .doc(idPost)
-  .collection('likes')
-  .doc(idLike)
-  .delete()
-  .then( console.log('Like Deleted') )
-  .catch( error => console.log(error))
-
+const deleteLike = (idPost, idLike) =>
+  firebase
+    .firestore()
+    .collection("posts")
+    .doc(idPost)
+    .collection("likes")
+    .doc(idLike)
+    .delete()
+    .then(console.log("Like Deleted"))
+    .catch((error) => console.log(error));
 
 export {
   savePost,
